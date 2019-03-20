@@ -133,7 +133,8 @@ export class SearchComponent implements OnInit {
         {
           "possibleMatches": this.searchResult.possible_persons != null ? this.searchResult.possible_persons.length : 0,
           "personMatch": this.searchResult.person != null,
-        });
+        }
+      );
 
     }, (error) => {
         this.viewState = ViewState.SEARCH_ERROR;
@@ -259,7 +260,17 @@ export class SearchComponent implements OnInit {
   }
 
   personClick(person) {
-        this.router.navigate(['/search', { search_pointer: person["@search_pointer"]}]);
+
+    // Find the index of the person clicked
+    let index = this.searchResult.possible_persons.indexOf(person);
+
+    this.analytics.sendEvent("click","possible_person",null,
+        {
+          "possiblePersonIndex": index
+        }
+    );
+
+    this.router.navigate(['/search', { search_pointer: person["@search_pointer"]}]);
 
   }
 
@@ -272,8 +283,17 @@ export class SearchComponent implements OnInit {
   }
 
   urlClick(url) {
+
+    let index = this.searchResult.person.urls.indexOf(url);
+
+    this.analytics.sendEvent("click","person_url",null,
+        {
+          "urlIndex": index
+        }
+    );
+
     if(!this.auth.isAuthenticated()) {
-      this.modal.open(this.authenticateModal);
+      this.openAuthenticateModal();
       return
     }
 
@@ -282,8 +302,17 @@ export class SearchComponent implements OnInit {
   }
 
   addressClick(address) {
+
+    let index = this.searchResult.person.addresses.indexOf(address);
+
+    this.analytics.sendEvent("click","person_address",null,
+        {
+          "addressIndex": index
+        }
+    );
+
     if(!this.auth.isAuthenticated()) {
-      this.modal.open(this.authenticateModal);
+      this.openAuthenticateModal();
       return
     }
 
@@ -292,8 +321,17 @@ export class SearchComponent implements OnInit {
   }
 
   emailClick(email) {
+
+    let index = this.searchResult.person.emails.indexOf(email);
+
+    this.analytics.sendEvent("click","person_email",null,
+        {
+          "emailIndex": index
+        }
+    );
+
     if(!this.auth.isAuthenticated()) {
-      this.modal.open(this.authenticateModal);
+      this.openAuthenticateModal();
       return
     }
 
@@ -301,8 +339,17 @@ export class SearchComponent implements OnInit {
   }
 
   phoneClick(phone) {
+
+    let index = this.searchResult.person.phones.indexOf(phone);
+
+    this.analytics.sendEvent("click","person_phone",null,
+        {
+          "phoneIndex": index
+        }
+    );
+
     if(!this.auth.isAuthenticated()) {
-      this.modal.open(this.authenticateModal);
+      this.openAuthenticateModal();
       return
     }
 
@@ -317,8 +364,13 @@ export class SearchComponent implements OnInit {
   }
 
   openAuthenticateModal() {
+    this.analytics.sendEvent("view","authenticate_modal");
     this.modal.open(this.authenticateModal);
+  }
 
+  openNoThanksModal() {
+    this.analytics.sendEvent("view","no_thanks_modal");
+    this.modal.open(this.noThanksModal);
   }
 
   authenticated() {
@@ -326,12 +378,14 @@ export class SearchComponent implements OnInit {
   }
 
   registerClick() {
+    this.analytics.sendEvent("click","register");
     this.auth.register();
   }
 
   noThanksClick() {
+    this.analytics.sendEvent("click","no_thanks");
     this.modal.dismissAll();
-    this.modal.open(this.noThanksModal);
+    this.openNoThanksModal();
   }
 
   closeModal() {

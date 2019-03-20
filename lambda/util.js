@@ -11,6 +11,7 @@ module.exports = class HttpClientUtils {
 
       return JSON.parse(queryParametersString.toString());
     } else {
+      console.debug("found body");
       return event.body;
     }
   }

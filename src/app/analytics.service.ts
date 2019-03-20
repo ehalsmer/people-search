@@ -34,7 +34,7 @@ export class AnalyticsService {
 
   }
 
-  sendEvent(verb:string, noun:string, outcome:string, options:object) {
+  sendEvent(verb:string, noun:string, outcome?:string, options?:object) {
 
     if(this.emailAddress == null) {
       console.warn("User email unknown, not sending analytic event");
@@ -45,9 +45,16 @@ export class AnalyticsService {
     headers.set("Content-Type","application/json; charset=utf-8");
 
     let bodyObject = new Object();
-    bodyObject["event"] = verb + "-" + noun + "-" + outcome;
+    bodyObject["event"] = verb + "-" + noun;
+
+    if(outcome != null) {
+      bodyObject["event"] += "-" + outcome;
+    }
+
     bodyObject["emailAddress"] = this.emailAddress;
-    bodyObject["options"] = options;
+
+    if(options != null)
+      bodyObject["options"] = options;
 
     this.http.post(
       environment.API_URL + "/api/sendEvent",
