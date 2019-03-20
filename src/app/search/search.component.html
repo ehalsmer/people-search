@@ -1,0 +1,221 @@
+<div class="container">
+
+  <app-header></app-header>
+
+  <div class="row searchRow">
+        <div class="col-md-12 col-lg-11 ">
+            <form [formGroup]="searchForm" (ngSubmit)="onSearch()">
+              <div class="row">
+
+                <div class="col-12">
+                  <div class="searchFormInputsWrapper">
+                    <div class="row">
+                      <div class="col-md-12 col-lg-8 searchInputWrapper">
+                        <input type="text"
+                               formControlName="searchInput"
+                               class="searchInput"
+                               placeholder="Full Name, Email, Phone, or URL"
+                               (keyup.enter)="onSearch()"
+                               autofocus />
+                      </div>
+                      <div class="col-md-12 col-lg-4 locationInputWrapper">
+                        <input type="text"
+                               formControlName="locationInput"
+                               class="locationInput"
+                               placeholder="City, State"
+                               (keyup.enter)="onSearch()" />
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+
+            </form>
+
+        </div>
+        <div class="col-md-12 col-lg-1">
+          <span class="searchButtonWrapper">
+            <button type="button" class="btn btn-primary" (click)="onSearch()">Search</button>
+          </span>
+        </div>
+  </div>
+
+  <div class="row"
+    *ngIf="viewState == ViewState.SEARCH_RESULT && searchResult.warnings != null">
+    <div class="col-12 ">
+      <div class="alert alert-warning" *ngFor="let warning of searchResult.warnings">{{translateWarningMessage(warning)}}</div>
+    </div>
+  </div>
+
+  <div class="row"
+    *ngIf="viewState == ViewState.SEARCH_LOADING">
+    <div class="col-12">
+          Loading...
+    </div>
+
+  </div>
+
+  <div class="row"
+    *ngIf="viewState == ViewState.SEARCH_ERROR">
+    <div class="col-12">
+      There was an error during the search. Please try again later, or <a href="mailto:support@connectourkids.org">Contact Support</a>.
+    </div>
+
+  </div>
+
+  <div class="row"
+    *ngIf="viewState == ViewState.NO_RESULTS">
+    <div class="col-12">
+      Sorry, no results were found for your search. Check the spelling and try again.
+    </div>
+
+  </div>
+
+  <div class="row" *ngIf="!authenticated() && viewState == ViewState.SEARCH_RESULT">
+    <div class="col-12">
+      <div class="alert alert-info">This is a preview. Social workers can have completely free access. <a href="javascript:void(0)" (click)="openAuthenticateModal()">Click here</a> to find out more.</div>
+    </div>
+  </div>
+
+  <div class="row"
+    *ngIf="viewState == ViewState.SEARCH_RESULT && searchResult?.person != null">
+    <div class="col-12 personResultWrapper">
+
+      <!-- Personal Details -->
+      <div class="row">
+        <div class="col-sm-3">
+          <img src="{{generateThumbnailUrl(searchResult.person)}}" width="100" height="100" />
+        </div>
+        <div class="col-sm-9">
+          <span class="personName"> {{searchResult.person.names[0]?.first}}
+          {{searchResult.person.names[0]?.middle}}
+          {{searchResult.person.names[0]?.last}}</span>
+          <br/>
+          {{searchResult.person.gender?.content}}
+          <br/>
+          {{searchResult.person.dob?.display}}
+
+        </div>
+      </div>
+
+      <!-- Email -->
+      <div class="row" *ngIf="searchResult.person?.emails?.length  > 0">
+        <div class="col-sm-3">Emails</div>
+        <div class="col-sm-9">
+          <div *ngFor="let email of searchResult.person?.emails; let in = index">
+            <a href="javascript:void(0)" (click)="emailClick(email)">{{email.address}}</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phone Numbers -->
+      <div class="row" *ngIf="searchResult.person?.phones?.length  > 0">
+        <div class="col-sm-3">Phone Numbers</div>
+        <div class="col-sm-9">
+          <div *ngFor="let phone of searchResult.person?.phones; let in = index">
+            <a href="javascript:void(0)}" (click)="phoneClick(phone)">{{generatePhoneDisplay(phone)}}</a>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- Addresses -->
+      <div class="row" *ngIf="searchResult.person?.addresses?.length  > 0">
+        <div class="col-sm-3">Addresses</div>
+        <div class="col-sm-9">
+          <div *ngFor="let address of searchResult.person?.addresses; let in = index">
+            <a href="javascript:void(0)" (click)="addressClick(address)" target="_blank">{{address.display}}</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Profiles
+      <div class="row">
+        <div class="col-sm-3">Profiles</div>
+        <div class="col-sm-9">
+          <div *ngFor="let profile of searchResult.person?.user_ids; let in = index">
+            <a href="{{generateProfileUrl(profile)}}">{{generateProfileName(profile)}}</a>
+          </div>
+        </div>
+      </div>
+      -->
+
+      <!-- URLS -->
+      <div class="row" *ngIf="filterUrls(searchResult.person?.urls).length  > 0">
+        <div class="col-sm-3">Websites</div>
+        <div class="col-sm-9">
+          <div *ngFor="let url of filterUrls(searchResult.person?.urls); let in = index">
+            <a href="javascript:void(0)" (click)="urlClick(url)" target="_blank">{{url["@name"]}}</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+    <div class="row"
+    *ngIf="viewState == ViewState.SEARCH_RESULT && searchResult?.possible_persons != null">
+
+      <div class="col-12">
+        <div class="row">
+          <div class="col-3">
+
+          </div>
+          <div class="col-9">
+            <h3>Possible Matches</h3>
+          </div>
+        </div>
+
+        <div class="row possibleMatchRow"
+          *ngFor="let person of searchResult.possible_persons"
+          (click)="personClick(person)">
+          <div class="col-3">
+            <a href="javascript:void(0)"><img src="{{generateThumbnailUrl(person)}}"
+                 width="75" height="75"
+                 /></a>
+          </div>
+          <div class="col-9">
+            <a href="javascript:void(0)"><span *ngIf="person.names != null"><strong>{{person.names[0]?.display}}</strong></span></a><br/>
+            {{person.dob?.display}}<span *ngIf="person.dob != null && person.gender != null">,</span> {{person.gender?.content}}<br/>
+            <span class="possibleMatchCityState" *ngFor="let cityState of uniqueCityStates(person.addresses)">
+              {{cityState}}
+            </span>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+</div>
+
+<ng-template #authenticateModal let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title" >Are you a social worker?</h4>
+    <button type="button" class="close" aria-label="Close" (click)="closeModal()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p>Connect Our Kids is a non-profit that provides 100% free tools for social workers working with foster kids. The only thing we ask is that you register an account with your work email, to verify your identity as a social worker.</p>
+  </div>
+  <div class="modal-footer justify-content-between">
+    <button type="button" class="btn btn-primary"  ngbAutofocus (click)="registerClick()">I am a social worker</button>
+    <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="noThanksClick()">No, thanks</button>
+  </div>
+</ng-template>
+
+<ng-template #noThanksModal let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Feedback Please</h4>
+    <button type="button" class="close" aria-label="Close" (click)="closeModal()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p>If you are a social worker, please take a moment to <a href="mailto:hello@connectourkids.org">send us an email</a>, and tell us how we can help you.</p>
+  </div>
+  <div class="modal-footer justify-content-between">
+    <button type="button" class="btn btn-primary" ngbAutofocus  (click)="closeModal()">Close</button>
+  </div>
+</ng-template>

@@ -1,0 +1,16 @@
+@import '../scss-util/mixins';
+
+#logo {
+  cursor: pointer;
+  position: relative;
+  left: -25px;
+}
+
+
+.menuRight {
+  margin-top: 25px;
+
+  @include respond-above(sm) {
+    text-align: right;
+  }
+}

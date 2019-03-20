@@ -1,0 +1,19 @@
+<div class="row">
+  <div class="col-12 col-sm-10">
+    <img src="assets/logo.png" id="logo" width="300"
+      (click)="logoClick()"/>
+
+  </div>
+
+  <div class="col-12 col-sm-2 menuRight">
+
+    <div *ngIf="!isAuthenticated()">
+          <a href="javascript:void(0);" (click)="login()"
+    >Log In</a> or <a href="javascript:void(0)" (click)="register()">Sign Up</a>
+    </div>
+
+
+    <a href="javascript:void(0);" (click)="logout()"
+    *ngIf="isAuthenticated()">Log Out</a>
+  </div>
+</div>

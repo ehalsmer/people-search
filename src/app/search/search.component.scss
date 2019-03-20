@@ -1,0 +1,120 @@
+@import '../scss-util/mixins';
+
+
+#searchLogo {
+  position: relative;
+  left: -25px;
+  cursor:pointer;
+}
+
+.searchRow {
+  margin-top: 2em;
+  margin-bottom: 2em;
+}
+
+.searchFormInputsWrapper {
+  border: 1px solid #dae1ea;
+  background: #fff;
+  border-radius: 4px;
+  padding: 0px 10px;
+  margin-bottom: 10px;
+}
+
+.searchInputWrapper,
+.locationInputWrapper {
+  height: 3em;
+
+  input {
+    width: 100%;
+  }
+}
+.searchFormInputsWrapper input[type=text] {
+    font-size: 2em;
+    font-weight: 400;
+    height: 100%;
+    border: none;
+    border-radius: 4px;
+    outline: none;
+    width: 100%;
+
+  @include respond-below(sm) {
+    font-size: 1em;
+  }
+
+}
+
+@include respond-above(md) {
+  .locationInputWrapper {
+    border-left: rgb(218, 225, 234) 1px solid;
+  }
+}
+
+.searchButtonWrapper {
+    vertical-align: top;
+    display: inline-block;
+    max-width: 80px;
+    height: 48px;
+}
+
+.searchButtonWrapper button {
+    width: 100%;
+    max-width: 200px;
+    height: 100%;
+    border: 1px solid rgb(80,141,179);
+    border-radius: 3px;
+    cursor: pointer;
+    z-index: 2;
+    background-color: rgb(80,141,179);
+
+}
+
+.personResultWrapper > div.row {
+  margin-bottom: 2em;
+
+  @include respond-above(md) {
+    > *:first-child {
+      text-align: right;
+    }
+  }
+
+}
+
+@include respond-below(md) {
+  .locationInput {
+    border-top: rgb(218, 225, 234) 1px solid !important;
+  }
+}
+
+
+
+.personName {
+  font-size: 1.5em;
+}
+
+.possibleMatchRow {
+  margin-top: 1em;
+  cursor: pointer;
+  padding: 5px 0px;
+
+  @include respond-above(md) {
+      > div:first-child > a {
+    float: right;
+  }
+}
+
+
+
+}
+
+.possibleMatchRow:hover {
+    background-color: #EEEEEE;
+    border-radius: 4px;
+  }
+
+.possibleMatchCityState {
+  margin-right: 1em;
+}
+
+.alert-info {
+  margin-bottom: 2em;
+}

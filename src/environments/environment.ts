@@ -3,7 +3,10 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  API_URL: "https://dev.search.connectourkids.org",
+  APP_URL: "http://localhost:4200",
+  AUTH0_CLIENT_ID: "JUR6JVt9N4sn8bHrSXR818rwrj91hsTb"
 };
 
 /*

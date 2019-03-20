@@ -1,0 +1,16 @@
+{
+  "serverless": {
+    "--": [
+      "—-provider",
+      "aws"
+    ],
+    "project": "cok-people-search-frontend",
+    "provider": "aws",
+    "skipInstall": false,
+    "directory": ".",
+    "serverless": {
+      "aws": {},
+      "gcloud": {}
+    }
+  }
+}
