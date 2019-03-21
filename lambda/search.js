@@ -6,6 +6,9 @@ const fs = require('fs');
 const jwt = require( 'jsonwebtoken');
 const HttpClientUtils = require('./util.js');
 const httpClientUtils = new HttpClientUtils();
+const sha256 = require('sha-256-js');
+const Cache = require('./cache.js')
+const cache = new Cache();
 
 
 let defaultThumbnail = "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";
@@ -22,11 +25,9 @@ exports.thumbnail = (event,context,callback) => {
     sendThumbnail(defaultThumbnail,callback);
   }
 
-
   let tokens = tokensString.split(",");
 
   recurseThumbnails(0,tokens,callback);
-
 
 };
 
@@ -99,19 +100,49 @@ exports.query = (event, context, callback) => {
       httpClientUtils.getApplicationParameters("/pipl/").then(
        function(parameters) {
 
-        let requestPromise =  request(
-         'POST',
-         makeQueryURL(queryParameters,parameters),
-         makeQueryBody(queryParameters)
-        );
+         let queryBody = makeQueryBody(queryParameters);
 
-        requestPromise.done((res) => {
+         let cacheKey = makeQueryCacheKey(makeQueryParts(queryParameters), queryParameters);
 
-          let responseBody = new String(res.getBody());
+         console.debug("Cache key: " +  cacheKey);
 
-            httpClientUtils.sendResponse(callback, res.statusCode, responseBody);
+         // Check the query cache
+         cache.get(cacheKey)
+           .then((cacheGetResponse) => {
 
-        });
+             if(cacheGetResponse.getItem() != null) {
+                console.log("Cache hit");
+                console.log(cacheGetResponse.getItem());
+                httpClientUtils.sendResponse(callback, 200, cacheGetResponse.getItem());
+                return;
+             }
+
+              let requestPromise =  request(
+               'POST',
+               makeQueryURL(queryParameters,parameters),
+               queryBody
+              );
+
+              requestPromise.done((result) => {
+
+                let responseBody = new String(result.getBody());
+
+                // Store successful results
+                if(result.statusCode == 200)
+                  cache.put(cacheKey, responseBody).then(
+                    result =>{
+                      console.debug("Dynamo Put Response: " + result)
+                      httpClientUtils.sendResponse(callback, result.statusCode, responseBody);
+
+                    });
+
+
+              });
+           });
+
+
+
+
        },
        function() {
          // error
@@ -128,15 +159,17 @@ exports.query = (event, context, callback) => {
 
 };
 
-function makeQueryBody(queryParameters) {
+function makeQueryCacheKey(queryBody, queryParameters) {
+  console.log("cache key query body: " + JSON.stringify(queryBody));
+  return sha256(JSON.stringify(queryBody)) + "-" + ((checkAuthentication(queryParameters)) ? "true" : "false")
+}
 
-  let FormData = request.FormData;
-  let data = new FormData();
+function makeQueryParts(queryParameters) {
 
+  let data = {};
 
-
-    if(queryParameters['search_pointer'] != null) {
-      data.append("search_pointer", queryParameters['search_pointer']);
+  if(queryParameters['search_pointer'] != null) {
+      data["search_pointer"] = queryParameters['search_pointer'];
     } else {
 
       let location = queryParameters['location'];
@@ -156,17 +189,30 @@ function makeQueryBody(queryParameters) {
 
       console.log("Field Name: " + fieldName);
 
-      data.append(fieldName, query);
+      data[fieldName] = query;
 
-      data.append("show_sources","false");
-      data.append("hide_sponsored", "true");
+      data["hide_sponsored"] = "true";
 
       if(location != null) {
-        data.append("raw_address", location);
+        data["raw_address"] = location;
       }
     }
 
-    return {form:  data};
+  return data;
+}
+
+function makeQueryBody(queryParameters) {
+
+  let FormData = request.FormData;
+  let data = new FormData();
+
+  let queryParts = makeQueryParts(queryParameters);
+
+  for(var key in queryParts) {
+    data.append(key,queryParts[key]);
+  }
+
+  return {form:  data};
 }
 
 function makeQueryURL(queryParameters,parameters) {

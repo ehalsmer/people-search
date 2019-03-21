@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { HttpClient} from "@angular/common/http";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {Router} from "@angular/router";
+import {Title} from "@angular/platform-browser";
+import {environment} from "../../environments/environment";
 
 
 @Component({
@@ -19,9 +21,14 @@ export class HomeComponent implements OnInit {
     locationInput: new FormControl('',)
   });
 
-  constructor(private http: HttpClient, private router:Router) { }
+  constructor(
+    private http: HttpClient,
+    private router:Router,
+    private title:Title) { }
 
-  ngOnInit(){}
+  ngOnInit(){
+    this.title.setTitle(environment.APP_NAME);
+  }
 
   ngAfterViewInit() {
   }

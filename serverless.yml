@@ -17,13 +17,18 @@ provider:
   environment:
     MIX_PANEL_KEY: ${self:custom.mixpanel.${self:provider.stage}}
   iamRoleStatements:
-    -  Effect: "Allow"
-       Action:
-         - "ssm:DescribeParameters"
-       Resource:
-         Fn::Join:
-           - ""
-           - - "*"
+    - Effect: "Allow"
+      Action:
+        - "dynamodb:PutItem"
+        - "dynamodb:GetItem"
+      Resource: "arn:aws:dynamodb:us-east-1:*:table/pipl-cache"
+    - Effect: "Allow"
+      Action:
+        - "ssm:DescribeParameters"
+      Resource:
+        Fn::Join:
+          - ""
+          - - "*"
     - Effect: "Allow"
       Action:
         - "ssm:GetParametersByPath"
@@ -65,8 +70,6 @@ custom:
   mixpanel:
     production: ${ssm:/people-search/mixpanel/production-key~true}
     dev: ${ssm:/people-search/mixpanel/dev-key~true}
-
-
 
 
 functions:

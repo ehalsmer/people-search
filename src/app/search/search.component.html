@@ -137,7 +137,7 @@
           <div class="dataRow" *ngFor="let address of filterAddresses(searchResult.person?.addresses); let in = index">
             <a href="javascript:void(0)" (click)="addressClick(address)" target="_blank">
               <div *ngIf="address.street != null">{{generateAddressHomeStreetDisplay(address)}}</div>
-              <div>{{address.city}} <span *ngIf="address.city != null">,</span> {{address.state}} {{generateAddressZipcodeDisplay(address)}}</div>
+              <div>{{address.city}}<span *ngIf="address.city != null">,</span> {{address.state}} {{generateAddressZipcodeDisplay(address)}}</div>
 
             </a>
               <div class="metaData">

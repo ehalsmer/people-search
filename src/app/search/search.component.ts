@@ -6,6 +6,7 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {AuthService} from "../auth-service.service";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {AnalyticsService} from "../analytics.service";
+import {Title} from "@angular/platform-browser";
 
 @Component({
   selector: 'app-search',
@@ -36,7 +37,8 @@ export class SearchComponent implements OnInit {
     private router: Router,
     private auth:AuthService,
     private modal:NgbModal,
-    private analytics:AnalyticsService
+    private analytics:AnalyticsService,
+    private title:Title
   ) { }
 
 
@@ -129,8 +131,27 @@ export class SearchComponent implements OnInit {
       if(this.searchResult.person == null
         && this.searchResult.possible_persons == null) {
         this.viewState = ViewState.NO_RESULTS;
+        this.title.setTitle("No results - " + environment.APP_NAME)
       } else {
         this.viewState = ViewState.SEARCH_RESULT;
+
+        if(this.searchResult.person != null
+            && this.searchResult.person.names != null) {
+
+          let name = this.searchResult.person.names[0];
+
+          let personName = name.first;
+          if(name.middle != null && name.middle.trim().length > 0)
+            personName += " " +name.middle;
+          personName += " " + name.last;
+
+          this.title.setTitle(personName + " - " + environment.APP_NAME);
+        } else {
+          let title = this.searchForm.get("searchInput").value;
+          if(this.searchForm.get("locationInput").value != "")
+            title += " - " + this.searchForm.get("locationInput").value
+          this.title.setTitle("Search: " + title + " - " + environment.APP_NAME);
+        }
       }
 
       this.analytics.sendEvent("search","person","success",
