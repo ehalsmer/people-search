@@ -15,6 +15,10 @@ let defaultThumbnail = "iVBORw0KGgoAAAANSUhEUgAAAEsAAABLCAIAAAC3LO29AAAGtUlEQVR4
 
 exports.thumbnail = (event,context,callback) => {
 
+  if(event.headers['Host'] == "search.connectourkids.org") {
+    console.debug = function() {}; // disable debug logging on production
+  }
+
   console.debug(event);
 
   let tokensString = event.queryStringParameters["tokens"];
@@ -59,7 +63,7 @@ function recurseThumbnails(index, tokens, callback) {
   request('GET', thumbnailurl)
     .done(function (res) {
 
-      console.log(res);
+      console.debug(res);
 
     if(res.statusCode != 200) {
       recurseThumbnails(index, tokens, callback);
@@ -74,6 +78,10 @@ function recurseThumbnails(index, tokens, callback) {
 
 exports.query = (event, context, callback) => {
 
+  if(event.headers['Host'] == "search.connectourkids.org") {
+    console.debug = function() {}; // disable debug logging on production
+  }
+
   console.debug(event);
 
   let queryParameters = httpClientUtils.getQueryParameters(event);
@@ -81,86 +89,68 @@ exports.query = (event, context, callback) => {
   console.debug("Query Parameters");
   console.debug(queryParameters);
 
-  let query = queryParameters['q'];
+  // Get the query parameters
+  httpClientUtils.getApplicationParameters("/pipl/").then(
+   function(parameters) {
 
-  // Check the test-data path for a matching query file
-  // This avoids charges against queries for known entities
-  let path = "test-data/" + query + ".json";
-  console.debug(query);
+     let queryParts = makeQueryParts(queryParameters);
+     console.log(queryParts);
 
-  try {
-    if (fs.existsSync(path)) {
-      fs.readFile(path, 'utf8', function(err, contents) {
-        console.debug("reading from " + query + ".json");
-        httpClientUtils.sendResponse(callback, 200, contents);
-      });
+     let queryBody = makeQueryBody(queryParts);
 
-    } else {
-      // Get the query parameters
-      httpClientUtils.getApplicationParameters("/pipl/").then(
-       function(parameters) {
+     let cacheKey = makeQueryCacheKey(queryParts, queryParameters);
 
-         let queryBody = makeQueryBody(queryParameters);
+     console.debug("Cache key: " +  cacheKey);
 
-         let cacheKey = makeQueryCacheKey(makeQueryParts(queryParameters), queryParameters);
+     // Check the query cache
+     cache.get(cacheKey)
+       .then((cacheGetResponse) => {
 
-         console.debug("Cache key: " +  cacheKey);
+         if(cacheGetResponse.getItem() != null) {
+            console.debug("Cache hit");
+            console.debug(cacheGetResponse.getItem());
+            httpClientUtils.sendResponse(callback, 200, cacheGetResponse.getItem());
+            return;
+         }
 
-         // Check the query cache
-         cache.get(cacheKey)
-           .then((cacheGetResponse) => {
+          let requestPromise =  request(
+           'POST',
+           makeQueryURL(queryParameters,parameters),
+           queryBody
+          );
 
-             if(cacheGetResponse.getItem() != null) {
-                console.log("Cache hit");
-                console.log(cacheGetResponse.getItem());
-                httpClientUtils.sendResponse(callback, 200, cacheGetResponse.getItem());
-                return;
-             }
+          requestPromise.done((result) => {
 
-              let requestPromise =  request(
-               'POST',
-               makeQueryURL(queryParameters,parameters),
-               queryBody
-              );
+            let responseBody = new String(result.getBody());
 
-              requestPromise.done((result) => {
+            // Store successful results
+            if(result.statusCode == 200)
+              cache.put(cacheKey, responseBody).then(
+                result =>{
+                  console.debug("Dynamo Put Response: " + result)
+                  httpClientUtils.sendResponse(callback, result.statusCode, responseBody);
 
-                let responseBody = new String(result.getBody());
-
-                // Store successful results
-                if(result.statusCode == 200)
-                  cache.put(cacheKey, responseBody).then(
-                    result =>{
-                      console.debug("Dynamo Put Response: " + result)
-                      httpClientUtils.sendResponse(callback, result.statusCode, responseBody);
-
-                    });
+                });
 
 
-              });
-           });
+          });
+       });
 
 
 
 
-       },
-       function() {
-         // error
-         httpClientUtils.sendResponse(callback, 500, "Could not read parameters");
-       }
-     );
-    }
-  } catch(err) {
-    console.error("error while reading file: " + err);
-    httpClientUtils.sendResponse(callback, 502, err);
-    // do nothing
-  }
+   },
+   function() {
+     // error
+     httpClientUtils.sendResponse(callback, 500, "Could not read parameters");
+   }
+ );
 
 
 };
 
 function makeQueryCacheKey(queryBody, queryParameters) {
-  console.log("cache key query body: " + JSON.stringify(queryBody));
+  console.debug("cache key query body: " + JSON.stringify(queryBody));
   return sha256(JSON.stringify(queryBody)) + "-" + ((checkAuthentication(queryParameters)) ? "true" : "false")
 }
 
@@ -187,7 +177,7 @@ function makeQueryParts(queryParameters) {
         fieldName = "username";
       }
 
-      console.log("Field Name: " + fieldName);
+      console.debug("Field Name: " + fieldName);
 
       data[fieldName] = query;
 
@@ -201,14 +191,12 @@ function makeQueryParts(queryParameters) {
   return data;
 }
 
-function makeQueryBody(queryParameters) {
+function makeQueryBody(queryParts) {
 
   let FormData = request.FormData;
   let data = new FormData();
 
-  let queryParts = makeQueryParts(queryParameters);
-
-  for(var key in queryParts) {
+  for(let key in queryParts) {
     data.append(key,queryParts[key]);
   }
 
