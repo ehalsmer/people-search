@@ -54,7 +54,7 @@ custom:
       - '*/*'
   stage: ${opt:stage, self:provider.stage}
   domains:
-    prod: search.connectourkids.org
+    production: search.connectourkids.org
     dev: dev.search.connectourkids.org
   customDomain:
     basePath: "/"
@@ -63,7 +63,7 @@ custom:
     createRoute53Record: true
     certificateName: "search.connectourkids.org"
   mixpanel:
-    prod: ${ssm:/people-search/mixpanel/prod-key~true}
+    production: ${ssm:/people-search/mixpanel/production-key~true}
     dev: ${ssm:/people-search/mixpanel/dev-key~true}
 
 

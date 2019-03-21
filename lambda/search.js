@@ -158,6 +158,9 @@ function makeQueryBody(queryParameters) {
 
       data.append(fieldName, query);
 
+      data.append("show_sources","false");
+      data.append("hide_sponsored", "true");
+
       if(location != null) {
         data.append("raw_address", location);
       }

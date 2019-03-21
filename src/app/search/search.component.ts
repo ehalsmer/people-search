@@ -61,6 +61,10 @@ export class SearchComponent implements OnInit {
 
   }
 
+  startOverClick() {
+        this.router.navigate(['/']);
+  }
+
   parametersChanged(params) {
 
     let searchInputValue = (params["q"] != null) ? params['q'] : "";
@@ -144,6 +148,50 @@ export class SearchComponent implements OnInit {
       });
   }
 
+  sortGeneric(items):[] {
+
+    return items;
+    return items.sort((aItem,bItem) => {
+      if(aItem == bItem) {
+        return;
+      }
+
+      let a = this.getLastSortDate(aItem);
+      let b = this.getLastSortDate(bItem);
+
+      return a>b ? -1 : a<b ? 1 : 0;
+
+    });
+  }
+
+  getLastSortDate(item):Date {
+    if(item == null)
+      return new Date(0,0,0,0,0,0,0);
+
+    if(item["@last_seen"] != null) {
+      return new Date(item["@last_seen"]);
+    }
+
+    if(item["@valid_since"] != null) {
+      return new Date(item["@valid_since"]);
+    }
+
+    return new Date(0,0,0,0,0,0,0);
+
+  }
+
+  filterPhones(phones) {
+    return this.sortGeneric(phones);
+  }
+
+  filterAddresses(addresses) {
+    return this.sortGeneric(addresses);
+  }
+
+  filterEmails(emails) {
+    return this.sortGeneric(emails);
+  }
+
   filterUrls(urls) {
     if(urls == null)
       return [];
@@ -154,19 +202,19 @@ export class SearchComponent implements OnInit {
       let url = urls[i];
 
       if(url.url == null) {
-
+        continue;
       }
 
-      if(url["@domain"].indexOf("beenverified.com") != -1)
+      if(url["@name"] == null)
         continue;
 
-      if(url["@domain"].indexOf("instantcheckmate.com") != -1)
+      if(url["@sponsored"] === true)
         continue;
 
       returnValue.push(url);
     }
 
-    return returnValue;
+    return this.sortGeneric(returnValue);
   }
 
 
@@ -354,6 +402,22 @@ export class SearchComponent implements OnInit {
     }
 
     window.location.href = "tel:" + phone.country_code + " " + phone.display;
+  }
+
+  generateAddressHomeStreetDisplay(address) {
+    if(!this.auth.isAuthenticated()) {
+      return "**** ********* **"
+    }
+    return address.house + " " + address.street;
+  }
+
+
+  generateAddressZipcodeDisplay(address) {
+    if(!this.auth.isAuthenticated()) {
+      return "****"
+    }
+
+    return address.zip_code;
   }
 
   generatePhoneDisplay(phone) {

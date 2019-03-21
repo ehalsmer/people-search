@@ -3,7 +3,7 @@
   <app-header></app-header>
 
   <div class="row searchRow">
-        <div class="col-md-12 col-lg-11 ">
+        <div class="col-md-12 col-lg-9 ">
             <form [formGroup]="searchForm" (ngSubmit)="onSearch()">
               <div class="row">
 
@@ -34,10 +34,10 @@
             </form>
 
         </div>
-        <div class="col-md-12 col-lg-1">
-          <span class="searchButtonWrapper">
-            <button type="button" class="btn btn-primary" (click)="onSearch()">Search</button>
-          </span>
+        <div class="col-md-12 col-lg-3">
+            <button type="button" class="btn btn-primary searchButton" (click)="onSearch()">Search</button>
+            <button type="button" class="btn btn-secondary searchButton" (click)="startOverClick()">Start Over</button>
+
         </div>
   </div>
 
@@ -92,40 +92,59 @@
           {{searchResult.person.names[0]?.middle}}
           {{searchResult.person.names[0]?.last}}</span>
           <br/>
-          {{searchResult.person.gender?.content}}
-          <br/>
-          {{searchResult.person.dob?.display}}
+          {{searchResult.person.dob?.display}} {{searchResult.person.gender?.content}}
 
         </div>
       </div>
 
       <!-- Email -->
-      <div class="row" *ngIf="searchResult.person?.emails?.length  > 0">
-        <div class="col-sm-3">Emails</div>
-        <div class="col-sm-9">
-          <div *ngFor="let email of searchResult.person?.emails; let in = index">
+      <div class="row" *ngIf="filterEmails(searchResult.person?.emails)?.length  > 0">
+        <div class="col-sm-3 sectionLabel">Emails</div>
+        <div class="col-sm-9 ">
+          <div class="dataRow" *ngFor="let email of filterEmails(searchResult.person?.emails); let in = index">
             <a href="javascript:void(0)" (click)="emailClick(email)">{{email.address}}</a>
+            <div class="metaData">
+            <span *ngIf="email['@type'] != null">{{email["@type"]}}</span>
+            <span *ngIf="getLastSortDate(email) != null
+                && getLastSortDate(email).getFullYear() != 1899">{{getLastSortDate(email).getFullYear()}}</span>
+            </div>
+
+
           </div>
         </div>
       </div>
 
       <!-- Phone Numbers -->
-      <div class="row" *ngIf="searchResult.person?.phones?.length  > 0">
-        <div class="col-sm-3">Phone Numbers</div>
+      <div class="row" *ngIf="filterPhones(searchResult.person?.phones)?.length  > 0">
+        <div class="col-sm-3 sectionLabel">Phone Numbers</div>
         <div class="col-sm-9">
-          <div *ngFor="let phone of searchResult.person?.phones; let in = index">
+          <div class="dataRow" *ngFor="let phone of filterPhones(searchResult.person?.phones); let in = index">
             <a href="javascript:void(0)}" (click)="phoneClick(phone)">{{generatePhoneDisplay(phone)}}</a>
+            <div class="metaData">
+              <span *ngIf="phone['@type'] != null">{{phone["@type"]}}</span>
+              <span *ngIf="getLastSortDate(phone) != null
+                    && getLastSortDate(phone).getFullYear() != 1899">{{getLastSortDate(phone).getFullYear()}}</span>
+             </div>
           </div>
         </div>
       </div>
 
 
       <!-- Addresses -->
-      <div class="row" *ngIf="searchResult.person?.addresses?.length  > 0">
-        <div class="col-sm-3">Addresses</div>
+      <div class="row" *ngIf="filterAddresses(searchResult.person?.addresses)?.length  > 0">
+        <div class="col-sm-3 sectionLabel">Addresses</div>
         <div class="col-sm-9">
-          <div *ngFor="let address of searchResult.person?.addresses; let in = index">
-            <a href="javascript:void(0)" (click)="addressClick(address)" target="_blank">{{address.display}}</a>
+          <div class="dataRow" *ngFor="let address of filterAddresses(searchResult.person?.addresses); let in = index">
+            <a href="javascript:void(0)" (click)="addressClick(address)" target="_blank">
+              <div *ngIf="address.street != null">{{generateAddressHomeStreetDisplay(address)}}</div>
+              <div>{{address.city}} <span *ngIf="address.city != null">,</span> {{address.state}} {{generateAddressZipcodeDisplay(address)}}</div>
+
+            </a>
+              <div class="metaData">
+                <span *ngIf="address['@type'] != null">{{address["@type"]}}</span>
+                <span *ngIf="getLastSortDate(address) != null
+                      && getLastSortDate(address).getFullYear() != 1899">{{getLastSortDate(address).getFullYear()}}</span>
+              </div>
           </div>
         </div>
       </div>
@@ -143,10 +162,19 @@
 
       <!-- URLS -->
       <div class="row" *ngIf="filterUrls(searchResult.person?.urls).length  > 0">
-        <div class="col-sm-3">Websites</div>
+        <div class="col-sm-3 sectionLabel">Websites</div>
         <div class="col-sm-9">
-          <div *ngFor="let url of filterUrls(searchResult.person?.urls); let in = index">
+          <div class="dataRow" *ngFor="let url of filterUrls(searchResult.person?.urls); let in = index">
             <a href="javascript:void(0)" (click)="urlClick(url)" target="_blank">{{url["@name"]}}</a>
+            <div class="metaData">
+              <span *ngIf="url['@type'] != null">{{url["@type"]}}</span>
+
+              <span *ngIf="getLastSortDate(url) != null
+                && getLastSortDate(url).getFullYear() != 1899">{{getLastSortDate(url).getFullYear()}}</span>
+            </div>
+
+
+
           </div>
         </div>
       </div>

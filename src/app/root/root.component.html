@@ -1,1 +1,10 @@
-<router-outlet></router-outlet>
+<div class="loadingComplete"
+  *ngIf="loadingComplete">
+  <router-outlet></router-outlet>
+</div>
+
+
+<div class="loadingNotComplete"
+  *ngIf="!loadingComplete">
+  Loading...
+</div>

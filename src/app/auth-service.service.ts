@@ -59,6 +59,8 @@ export class AuthService {
         this.localLogin(authResult);
         this.router.navigate(['/']);
       } else if (err) {
+        console.error(err);
+
         this.lastErrorMessage = err.errorDescription;
 
         if(this.lastErrorMessage.indexOf("Please verify your email before logging in.") != -1)
@@ -68,7 +70,6 @@ export class AuthService {
         else
           this.router.navigate(['/auth-error']);
 
-        console.log(err);
       }
     });
   }
@@ -156,15 +157,15 @@ export class AuthService {
     return new Date().getTime() < this._expiresAt;
   }
 
-  public waitForUserProfile():Promise<Object> {
+  public waitForUserProfile(timeout?:number):Promise<Object> {
     return new Promise(resolve => {
-      this.recurseWaitForUserProfile(resolve);
+      this.recurseWaitForUserProfile(resolve,timeout);
     });
   }
 
-  public recurseWaitForUserProfile(resolve) {
+  public recurseWaitForUserProfile(resolve, timeout?:number) {
      if(this.userProfile == null){
-        setTimeout(() => {this.recurseWaitForUserProfile(resolve)},100);
+        setTimeout(() => {this.recurseWaitForUserProfile(resolve)},timeout);
     } else {
       // when while-loop breaks, resolve the promise to continue
       resolve(this.userProfile);

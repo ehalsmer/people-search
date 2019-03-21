@@ -54,6 +54,17 @@
     display: inline-block;
     max-width: 80px;
     height: 48px;
+
+}
+
+.searchButton {
+  height: 50px;
+  margin-right: 15px;
+}
+
+.searchButton.btn-primary {
+      border: 1px solid rgb(80,141,179);
+
 }
 
 .searchButtonWrapper button {
@@ -64,19 +75,21 @@
     border-radius: 3px;
     cursor: pointer;
     z-index: 2;
-    background-color: rgb(80,141,179);
+
 
 }
 
-.personResultWrapper > div.row {
-  margin-bottom: 2em;
+.personResultWrapper {
 
-  @include respond-above(md) {
-    > *:first-child {
-      text-align: right;
+  > div.row {
+    margin-bottom: 2em;
+
+    @include respond-above(md) {
+      > *:first-child {
+        text-align: right;
+      }
     }
   }
-
 }
 
 @include respond-below(md) {
@@ -117,4 +130,32 @@
 
 .alert-info {
   margin-bottom: 2em;
+}
+
+.dataRow {
+  margin-bottom: 1em;
+}
+.metaData {
+  color: #CCC;
+  font-size: 0.75em;
+  font-weight: bolder;
+  clear:left;
+}
+
+.metaData span:first-child {
+  margin-left: 0em;
+}
+
+.metaData span {
+  display: inline-block;
+  margin-left: 1em;
+}
+
+.sectionLabel {
+  font-weight: bold;
+  margin-bottom: 1em;
+}
+
+.personName{
+  font-weight: bold;
 }

@@ -9,6 +9,8 @@ import {AnalyticsService} from "../analytics.service";
 })
 export class RootComponent implements OnInit {
 
+  public loadingComplete:boolean = false;
+
   constructor(public auth: AuthService, public analytics:AnalyticsService) {
     auth.handleAuthentication();
     auth.scheduleRenewal();
@@ -18,22 +20,25 @@ export class RootComponent implements OnInit {
   ngOnInit() {
     if (localStorage.getItem('isLoggedIn') === 'true') {
       this.auth.renewTokens();
-      this.auth.waitForAuthReady().then(
-        ()=> {
 
-          if(this.auth.isAuthenticated()) {
-            this.auth.getProfile();
-
-            this.auth.waitForUserProfile().then(
-              (user) => {
-                this.analytics.sendUserInfo(user["name"]);
-              }
-            );
-          }
-
-        }
-      );
+      this.auth.waitForAuthReady().then(() =>{
+        this.loadingComplete = true;
+      })
+    } else {
+      this.loadingComplete = true;
     }
+
+
+    this.auth.waitForUserProfile(1000).then(
+      (user) => {
+        this.analytics.sendUserInfo(user["name"]);
+      }
+    );
+
+
+
+
+
   }
 
 }
