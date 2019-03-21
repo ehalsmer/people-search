@@ -21,7 +21,10 @@ provider:
       Action:
         - "dynamodb:PutItem"
         - "dynamodb:GetItem"
-      Resource: "arn:aws:dynamodb:us-east-1:*:table/pipl-cache"
+        - "dynamodb:BatchWriteItem"
+      Resource:
+        - "arn:aws:dynamodb:us-east-1:*:table/pipl-cache"
+        - "arn:aws:dynamodb:us-east-1:*:table/pipl-search-pointers"
     - Effect: "Allow"
       Action:
         - "ssm:DescribeParameters"

@@ -75,7 +75,7 @@ export class SearchComponent implements OnInit {
     this.searchForm.setValue({"searchInput": searchInputValue,"locationInput": locationInputValue });
 
     if( (params["q"] == null || params["q"].trim() == "")
-        && params["search_pointer"] == null) {
+        && params["person"] == null) {
       this.router.navigate(["/"]);
       return;
     }
@@ -85,8 +85,8 @@ export class SearchComponent implements OnInit {
 
     let bodyObject = {};
 
-    if(params["search_pointer"] != null) {
-      bodyObject["search_pointer"] = params["search_pointer"];
+    if(params["person"] != null) {
+      bodyObject["person"] = params["person"];
     } else {
       if(params["q"] != null && params["q"].trim() != "") {
         bodyObject["q"] = params["q"];
@@ -339,7 +339,7 @@ export class SearchComponent implements OnInit {
         }
     );
 
-    this.router.navigate(['/search', { search_pointer: person["@search_pointer"]}]);
+    this.router.navigate(['/search', { person: person["@search_pointer_hash"]}]);
 
   }
 

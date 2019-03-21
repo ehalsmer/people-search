@@ -7,7 +7,11 @@ const jwt = require( 'jsonwebtoken');
 const HttpClientUtils = require('./util.js');
 const httpClientUtils = new HttpClientUtils();
 const sha256 = require('sha-256-js');
-const Cache = require('./cache.js')
+const Cache = require('./search-cache.js');
+const SearchPointersCache = require('./search-pointers-cache');
+const CachePutRequest = require('./cache-put-request');
+const searchPointersCache = new SearchPointersCache();
+
 const cache = new Cache();
 
 
@@ -78,7 +82,8 @@ function recurseThumbnails(index, tokens, callback) {
 
 exports.query = (event, context, callback) => {
 
-  if(event.headers['Host'] == "search.connectourkids.org") {
+  if(event.headers != null
+      && event.headers['Host'] == "search.connectourkids.org") {
     console.debug = function() {}; // disable debug logging on production
   }
 
@@ -93,51 +98,61 @@ exports.query = (event, context, callback) => {
   httpClientUtils.getApplicationParameters("/pipl/").then(
    function(parameters) {
 
-     let queryParts = makeQueryParts(queryParameters);
-     console.log(queryParts);
+     makeQueryParts(queryParameters)
+       .then(queryParts =>{
 
-     let queryBody = makeQueryBody(queryParts);
+         console.log(queryParts);
 
-     let cacheKey = makeQueryCacheKey(queryParts, queryParameters);
+         let queryBody = makeQueryBody(queryParts);
 
-     console.debug("Cache key: " +  cacheKey);
+         let cacheKey = makeQueryCacheKey(queryParts, queryParameters);
 
-     // Check the query cache
-     cache.get(cacheKey)
-       .then((cacheGetResponse) => {
+         console.debug("Cache key: " +  cacheKey);
 
-         if(cacheGetResponse.getItem() != null) {
-            console.debug("Cache hit");
-            console.debug(cacheGetResponse.getItem());
-            httpClientUtils.sendResponse(callback, 200, cacheGetResponse.getItem());
-            return;
-         }
+         // Check the query cache
+         cache.get(cacheKey)
+           .then((cacheGetResponse) => {
 
-          let requestPromise =  request(
-           'POST',
-           makeQueryURL(queryParameters,parameters),
-           queryBody
-          );
+             if(cacheGetResponse.getItem() != null) {
+                console.debug("Cache hit");
+                console.debug(cacheGetResponse.getItem());
+                httpClientUtils.sendResponse(callback, 200, cacheGetResponse.getItem());
+                return;
+             }
 
-          requestPromise.done((result) => {
+              let requestPromise =  request(
+               'POST',
+               makeQueryURL(queryParameters,parameters),
+               queryBody
+              );
 
-            let responseBody = new String(result.getBody());
+              requestPromise.done((result) => {
+                // replace possible person search pointers with hashes
 
-            // Store successful results
-            if(result.statusCode == 200)
-              cache.put(cacheKey, responseBody).then(
-                result =>{
-                  console.debug("Dynamo Put Response: " + result)
-                  httpClientUtils.sendResponse(callback, result.statusCode, responseBody);
+                let responseBody = new String(result.getBody());
 
-                });
+                processPiplResponseBody(responseBody).then(
+                  processedResponseBody => {
 
+                    // Store successful results
+                    if(result.statusCode == 200)
+                      cache.put(cacheKey, processedResponseBody).then(
+                        result => {
+                          //console.debug("Dynamo Put Response: " + result);
+                          httpClientUtils.sendResponse(callback, result.statusCode, processedResponseBody);
 
-          });
-       });
+                        }
+                      );
+                  }
+                );
 
+              });
+           });
 
-
+     })
+       .catch( error =>{
+         httpClientUtils.sendResponse(callback, 500, error);
+});
 
    },
    function() {
@@ -149,6 +164,75 @@ exports.query = (event, context, callback) => {
 
 };
 
+
+/** Does transformations on the response from Pipl before returning the results */
+function processPiplResponseBody(responseBody) {
+
+  let response = JSON.parse(responseBody);
+
+  let putRequests = [];
+
+  if(response.possible_persons != null) {
+      for(let possiblePerson of response.possible_persons) {
+
+        let hash = "";
+
+        if(possiblePerson.names != null
+          && possiblePerson.names.length > 0){
+
+          if(possiblePerson.names[0].first)
+            hash = possiblePerson.names[0].first;
+
+          if(possiblePerson.names[0].middle) {
+            if(hash != "")
+              hash += "-";
+            hash += possiblePerson.names[0].middle
+          }
+
+          if(possiblePerson.names[0].last) {
+            if(hash != "")
+              hash += "-";
+            hash += possiblePerson.names[0].last
+          }
+
+          if(hash != "")
+            hash += "-";
+
+          hash += sha256(possiblePerson["@search_pointer"]).substr(0,15);
+        } else {
+          hash = sha256(possiblePerson["@search_pointer"]).substr(0,15);
+        }
+
+        possiblePerson["@search_pointer_hash"] = hash;
+
+        // The hash to save in bulk
+        putRequests.push(new CachePutRequest(hash,possiblePerson["@search_pointer"]));
+      }
+  }
+
+
+  console.debug("Put Requests");
+  console.debug(putRequests);
+
+  let bodyProcessed = JSON.stringify(response);
+
+  if(putRequests.length == 0) {
+    return new Promise( resolve => {
+      resolve(bodyProcessed)
+    })
+  }
+
+  return new Promise(resolve => {
+    searchPointersCache.put(putRequests).then(
+      success => {
+        // TODO what happens when the puts are not successful?
+        // Need to use error catching
+          resolve(bodyProcessed);
+      });
+  });
+
+}
+
 function makeQueryCacheKey(queryBody, queryParameters) {
   console.debug("cache key query body: " + JSON.stringify(queryBody));
   return sha256(JSON.stringify(queryBody)) + "-" + ((checkAuthentication(queryParameters)) ? "true" : "false")
@@ -156,12 +240,22 @@ function makeQueryCacheKey(queryBody, queryParameters) {
 
 function makeQueryParts(queryParameters) {
 
-  let data = {};
+  console.debug("Make Query Parts: ");
+  console.debug(queryParameters);
 
-  if(queryParameters['search_pointer'] != null) {
-      data["search_pointer"] = queryParameters['search_pointer'];
-    } else {
+  if(queryParameters['person'] != null) {
+    return new Promise((resolve) => {
+      // get the real search pointer from the hash
+      searchPointersCache.get(queryParameters['person']).then(
+        value => {
+          resolve( {"search_pointer": value.getItem() });
+        }
+      );
+    });
 
+  } else {
+
+    return new Promise( (resolve) => {
       let location = queryParameters['location'];
       let query = queryParameters['q'].trim();
 
@@ -179,6 +273,8 @@ function makeQueryParts(queryParameters) {
 
       console.debug("Field Name: " + fieldName);
 
+      let data = {};
+
       data[fieldName] = query;
 
       data["hide_sponsored"] = "true";
@@ -186,9 +282,13 @@ function makeQueryParts(queryParameters) {
       if(location != null) {
         data["raw_address"] = location;
       }
-    }
 
-  return data;
+      resolve(data);
+    });
+
+
+  }
+
 }
 
 function makeQueryBody(queryParts) {

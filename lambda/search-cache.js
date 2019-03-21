@@ -2,6 +2,7 @@ let AWS = require('aws-sdk');
 AWS.config.update({region: 'us-east-1'});
 
 let CacheGetResponse = require('./cache-response');
+let CachePutRequest = require( './cache-put-request');
 
 let docClient = new AWS.DynamoDB.DocumentClient({apiVersion: '2012-08-10'});
 let tableName = 'pipl-cache';
@@ -20,7 +21,7 @@ module.exports = class Cache{
       Item: {
         'queryHash': key,
         'queryResponse': JSON.stringify(value),
-        'ttl': new Date().getTime() + (24 * 60 * 60)
+        'ttl': Math.round(new Date().getTime()/1000) + (24 * 60 * 60)
       }
     };
 
@@ -71,7 +72,7 @@ module.exports = class Cache{
             return false;
     }
     return true;
-}
+  }
 
 };
 
