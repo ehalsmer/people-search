@@ -429,7 +429,23 @@ export class SearchComponent implements OnInit {
     if(!this.auth.isAuthenticated()) {
       return "**** ********* **"
     }
-    return address.house + " " + address.street;
+
+    let returnValue = "";
+
+    if(address.house != null)
+      returnValue += address.house;
+
+    if(address.street != null) {
+
+      if(returnValue != "")
+        returnValue += " ";
+
+      returnValue += address.street;
+
+
+    }
+
+    return returnValue;
   }
 
 
