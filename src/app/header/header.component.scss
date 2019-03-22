@@ -13,4 +13,8 @@
   @include respond-above(sm) {
     text-align: right;
   }
+
+  @include respond-above(md) {
+    text-align: left;
+  }
 }
