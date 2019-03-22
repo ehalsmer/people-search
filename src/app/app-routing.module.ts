@@ -7,6 +7,8 @@ import {AuthVerifyEmailComponent} from "./auth-verify-email/auth-verify-email.co
 import {CallbackComponent} from "./callback/callback.component";
 import {AuthAccessDeniedComponent} from "./auth-access-denied/auth-access-denied.component";
 import {LoggedOutComponent} from "./logged-out/logged-out.component";
+import {TermsComponent} from "./terms/terms.component";
+import {PrivacyComponent} from "./privacy/privacy.component";
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -15,7 +17,9 @@ const routes: Routes = [
   { path: 'verify-email', component: AuthVerifyEmailComponent},
   { path: 'callback', component: CallbackComponent},
   { path: 'request-access', component: AuthAccessDeniedComponent},
-  { path: 'logged-out', component: LoggedOutComponent}
+  { path: 'logged-out', component: LoggedOutComponent},
+  { path: 'terms', component: TermsComponent},
+  { path: 'privacy', component: PrivacyComponent}
 ];
 
 @NgModule({

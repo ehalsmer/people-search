@@ -17,6 +17,9 @@ import { AuthVerifyEmailComponent } from './auth-verify-email/auth-verify-email.
 import { AuthEmailVerifiedComponent } from './auth-email-verified/auth-email-verified.component';
 import { AuthAccessDeniedComponent } from './auth-access-denied/auth-access-denied.component';
 import { LoggedOutComponent } from './logged-out/logged-out.component';
+import { TermsComponent } from './terms/terms.component';
+import { PrivacyComponent } from './privacy/privacy.component';
+import { FooterComponent } from './footer/footer.component';
 
 @NgModule({
   declarations: [
@@ -29,7 +32,10 @@ import { LoggedOutComponent } from './logged-out/logged-out.component';
     AuthVerifyEmailComponent,
     AuthEmailVerifiedComponent,
     AuthAccessDeniedComponent,
-    LoggedOutComponent
+    LoggedOutComponent,
+    TermsComponent,
+    PrivacyComponent,
+    FooterComponent
   ],
   imports: [
     BrowserModule,
