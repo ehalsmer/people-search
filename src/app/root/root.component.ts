@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {AuthService} from "../auth-service.service";
+import {AuthService} from "../auth.service";
 import {AnalyticsService} from "../analytics.service";
 
 @Component({
@@ -28,17 +28,20 @@ export class RootComponent implements OnInit {
       this.loadingComplete = true;
     }
 
-
     this.auth.waitForUserProfile(1000).then(
       (user) => {
         this.analytics.sendUserInfo(user["name"]);
+
+        // @ts-ignore
+        let opts = window._sva = window._sva || {};
+
+        opts.traits = {
+            "user_id": user["name"]
+        };
       }
     );
 
-
-
-
-
   }
+
 
 }

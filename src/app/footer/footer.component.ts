@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import {AnalyticsService} from "../analytics.service";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-footer',
@@ -9,9 +11,24 @@ export class FooterComponent implements OnInit {
 
   year = new Date().getFullYear();
 
-  constructor() { }
+  constructor(
+    private router:Router,
+    private analytics:AnalyticsService
+
+  ) { }
 
   ngOnInit() {
   }
 
+  privacyClick() {
+    this.analytics.sendEvent("click","privacy");
+    this.router.navigate(["/privacy"]);
+  }
+
+  termsClick() {
+    this.analytics.sendEvent("click","terms");
+    this.router.navigate(["/terms"]);
+  }
+
 }
+

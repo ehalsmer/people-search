@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable, NgZone} from '@angular/core';
 import { Router } from '@angular/router';
 import * as auth0 from 'auth0-js';
 import { environment } from "../environments/environment";
@@ -12,7 +12,7 @@ export class AuthService {
   private _accessToken: string;
   private _expiresAt: number;
 
-  private userProfile;
+  public userProfile;
 
   lastErrorMessage = "Unknown Error";
 
@@ -28,7 +28,7 @@ export class AuthService {
 
 
 
-  constructor(public router: Router) {
+  constructor(public router: Router, private _ngZone: NgZone) {
     this._idToken = '';
     this._accessToken = '';
     this._expiresAt = 0;
@@ -159,13 +159,17 @@ export class AuthService {
 
   public waitForUserProfile(timeout?:number):Promise<Object> {
     return new Promise(resolve => {
-      this.recurseWaitForUserProfile(resolve,timeout);
+      this._ngZone.runOutsideAngular( () => {
+        this.recurseWaitForUserProfile(resolve, timeout);
+      });
     });
   }
 
+
   public recurseWaitForUserProfile(resolve, timeout?:number) {
-     if(this.userProfile == null){
-        setTimeout(() => {this.recurseWaitForUserProfile(resolve)},timeout);
+    let self = this;
+    if(this.userProfile == null){
+        setTimeout(function() {self.recurseWaitForUserProfile(resolve, timeout)},timeout);
     } else {
       // when while-loop breaks, resolve the promise to continue
       resolve(this.userProfile);
@@ -174,15 +178,18 @@ export class AuthService {
 
   public waitForAuthReady():Promise<boolean> {
     return new Promise(resolve => {
-      this.recurseWaitForAuthReady(resolve);
+      this._ngZone.runOutsideAngular(() => {this.recurseWaitForAuthReady(resolve)});
     });
   }
 
   private recurseWaitForAuthReady(resolve):void {
-
+    let self = this;
     if(localStorage.getItem('isLoggedIn') === 'true' && this._accessToken == ""){
-        setTimeout(() => {this.recurseWaitForAuthReady(resolve)},100);
-    } else {
+      setTimeout(function () {
+        self.recurseWaitForAuthReady(resolve)
+      }, 100)
+    }
+     else {
       // when while-loop breaks, resolve the promise to continue
       resolve(this.isAuthenticated());
     }

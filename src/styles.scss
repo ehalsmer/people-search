@@ -1,4 +1,5 @@
 /* You can add global styles to this file, and also import other style files */
+@import './app/scss-util/mixins';
 
 @font-face{
     font-family:"Futura-LT-W01-Light";
@@ -26,5 +27,17 @@ a {
 }
 
 
+.videoIframe {
+
+  height: 262px;
+
+  @include respond-above(sm) {
+        height: 262px;
+  }
+
+  @include respond-above(md) {
+        height: 431px;
+  }
 
 
+}

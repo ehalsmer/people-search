@@ -3,10 +3,11 @@ import {environment} from "../../environments/environment";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {ActivatedRoute, Router} from "@angular/router";
-import {AuthService} from "../auth-service.service";
+import {AuthService} from "../auth.service";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {AnalyticsService} from "../analytics.service";
 import {Title} from "@angular/platform-browser";
+import {HeaderComponent} from "../header/header.component";
 
 @Component({
   selector: 'app-search',
@@ -19,8 +20,7 @@ export class SearchComponent implements OnInit {
   ViewState = ViewState;
   viewState = ViewState.NO_SEARCH;
 
-  @ViewChild('authenticateModal') authenticateModal:ElementRef;
-  @ViewChild('noThanksModal') noThanksModal:ElementRef;
+  @ViewChild('header') header:HeaderComponent;
 
   searchForm = new FormGroup({
     searchInput: new FormControl('', Validators.minLength(1)),
@@ -59,7 +59,6 @@ export class SearchComponent implements OnInit {
     let locationValue = this.searchForm.get('locationInput').value;
 
     this.router.navigate(['/search', { q: searchValue, location: locationValue }]);
-
 
   }
 
@@ -238,6 +237,39 @@ export class SearchComponent implements OnInit {
     return this.sortGeneric(returnValue);
   }
 
+  filterRelationships(relationships) {
+    if(relationships == null)
+      return [];
+
+    let returnValue = [];
+
+    for(let relationship of relationships) {
+
+
+      returnValue.push(relationship);
+    }
+
+
+    return this.sortGeneric(returnValue);
+
+  }
+
+  relationshipClick(relationship) {
+
+    let index = this.searchResult.person.relationships.indexOf(relationship);
+
+    this.analytics.sendEvent("click","relationship",null,
+        {
+          "relationshipIndex": index
+        }
+    );
+
+    this.router.navigate(['/search', { q: relationship.names[0].display}]);
+
+    window.scroll(0,0);
+
+  }
+
 
   generateProfileUrl(profile) {
 
@@ -362,7 +394,7 @@ export class SearchComponent implements OnInit {
     );
 
     if(!this.auth.isAuthenticated()) {
-      this.openAuthenticateModal();
+      this.header.openSocialWorkerCheckModal();
       return
     }
 
@@ -381,7 +413,7 @@ export class SearchComponent implements OnInit {
     );
 
     if(!this.auth.isAuthenticated()) {
-      this.openAuthenticateModal();
+      this.header.openSocialWorkerCheckModal();
       return
     }
 
@@ -400,7 +432,7 @@ export class SearchComponent implements OnInit {
     );
 
     if(!this.auth.isAuthenticated()) {
-      this.openAuthenticateModal();
+      this.header.openSocialWorkerCheckModal();
       return
     }
 
@@ -418,7 +450,7 @@ export class SearchComponent implements OnInit {
     );
 
     if(!this.auth.isAuthenticated()) {
-      this.openAuthenticateModal();
+      this.header.openSocialWorkerCheckModal();
       return
     }
 
@@ -464,34 +496,10 @@ export class SearchComponent implements OnInit {
     return phone.country_code + "-" + phone.display;
   }
 
-  openAuthenticateModal() {
-    this.analytics.sendEvent("view","authenticate_modal");
-    this.modal.open(this.authenticateModal);
-  }
-
-  openNoThanksModal() {
-    this.analytics.sendEvent("view","no_thanks_modal");
-    this.modal.open(this.noThanksModal);
-  }
-
   authenticated() {
     return this.auth.isAuthenticated();
   }
 
-  registerClick() {
-    this.analytics.sendEvent("click","register");
-    this.auth.register();
-  }
-
-  noThanksClick() {
-    this.analytics.sendEvent("click","no_thanks");
-    this.modal.dismissAll();
-    this.openNoThanksModal();
-  }
-
-  closeModal() {
-    this.modal.dismissAll();
-  }
 }
 
 

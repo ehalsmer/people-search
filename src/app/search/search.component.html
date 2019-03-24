@@ -1,6 +1,6 @@
 <div class="container">
 
-  <app-header></app-header>
+  <app-header #header></app-header>
 
   <div class="row searchRow">
         <div class="col-md-12 col-lg-9 ">
@@ -74,7 +74,7 @@
 
   <div class="row" *ngIf="!authenticated() && viewState == ViewState.SEARCH_RESULT">
     <div class="col-12">
-      <div class="alert alert-info">This is a preview. Social workers can have completely free access. <a href="javascript:void(0)" (click)="openAuthenticateModal()">Click here</a> to find out more.</div>
+      <div class="alert alert-info">This is a preview. Social workers can have completely free access. <a href="javascript:void(0)" (click)="header.openSocialWorkerCheckModal()">Click here</a> to find out more.</div>
     </div>
   </div>
 
@@ -88,13 +88,15 @@
           <img src="{{generateThumbnailUrl(searchResult.person)}}" width="100" height="100" />
         </div>
         <div class="col-sm-9">
-          <span class="personName"> {{searchResult.person.names[0]?.first}}
+          <span class="personName" *ngIf="searchResult.person.names != null && searchResult.person.names.length > 0"> {{searchResult.person.names[0]?.first}}
           {{searchResult.person.names[0]?.middle}}
           {{searchResult.person.names[0]?.last}}</span>
-          <br/>
+                    <div>
           {{searchResult.person.dob?.display}} {{searchResult.person.gender?.content}}
 
+          </div>
         </div>
+
       </div>
 
       <!-- Email -->
@@ -108,8 +110,6 @@
             <span *ngIf="getLastSortDate(email) != null
                 && getLastSortDate(email).getFullYear() != 1899">{{getLastSortDate(email).getFullYear()}}</span>
             </div>
-
-
           </div>
         </div>
       </div>
@@ -172,9 +172,19 @@
               <span *ngIf="getLastSortDate(url) != null
                 && getLastSortDate(url).getFullYear() != 1899">{{getLastSortDate(url).getFullYear()}}</span>
             </div>
+          </div>
+        </div>
+      </div>
 
-
-
+      <!-- Relatives -->
+      <div class="row" *ngIf="filterRelationships(searchResult.person?.relationships).length  > 0">
+        <div class="col-sm-3 sectionLabel">Relationships</div>
+        <div class="col-sm-9">
+          <div class="dataRow" *ngFor="let relationship of filterRelationships(searchResult.person?.relationships); let in = index">
+            <a href="javascript:void(0)" (click)="relationshipClick(relationship)" target="_blank">{{relationship.names[0]["display"]}}</a>
+            <div class="metaData">
+              <span *ngIf="relationship['@type'] != null">{{relationship["@type"]}}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -220,33 +230,3 @@
 
 </div>
 
-<ng-template #authenticateModal let-c="close" let-d="dismiss">
-  <div class="modal-header">
-    <h4 class="modal-title" >Are you a social worker?</h4>
-    <button type="button" class="close" aria-label="Close" (click)="closeModal()">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-  <div class="modal-body">
-    <p>Connect Our Kids is a non-profit that provides 100% free tools for social workers working with foster kids. The only thing we ask is that you register an account with your work email, to verify your identity as a social worker.</p>
-  </div>
-  <div class="modal-footer justify-content-between">
-    <button type="button" class="btn btn-primary"  ngbAutofocus (click)="registerClick()">I am a social worker</button>
-    <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="noThanksClick()">No, thanks</button>
-  </div>
-</ng-template>
-
-<ng-template #noThanksModal let-c="close" let-d="dismiss">
-  <div class="modal-header">
-    <h4 class="modal-title">Feedback Please</h4>
-    <button type="button" class="close" aria-label="Close" (click)="closeModal()">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-  <div class="modal-body">
-    <p>If you are a social worker, please take a moment to <a href="mailto:hello@connectourkids.org">send us an email</a>, and tell us how we can help you.</p>
-  </div>
-  <div class="modal-footer justify-content-between">
-    <button type="button" class="btn btn-primary" ngbAutofocus  (click)="closeModal()">Close</button>
-  </div>
-</ng-template>

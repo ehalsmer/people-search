@@ -5,7 +5,9 @@ plugins:
   - serverless-apigw-binary
   - serverless-apigwy-binary
   - serverless-plugin-include-dependencies
+  - serverless-associate-waf
   - serverless-domain-manager
+
 
 provider:
   name: aws
@@ -73,6 +75,8 @@ custom:
   mixpanel:
     production: ${ssm:/people-search/mixpanel/production-key~true}
     dev: ${ssm:/people-search/mixpanel/dev-key~true}
+  associateWaf:
+    name: us-only
 
 
 functions:

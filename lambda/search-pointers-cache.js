@@ -38,11 +38,13 @@ module.exports = class SearchPointersCache {
 
     let params = {RequestItems: {}};
 
-    params.RequestItems[tableName]  = [];
+    let items = [];
+
+    ;
 
     for(let putRequest of cachePutRequests) {
 
-      params.RequestItems[tableName].push( {
+      items.push( {
         PutRequest: {
           Item: {
             "search_pointer_hash": { "S": putRequest.getKey() },
@@ -58,21 +60,48 @@ module.exports = class SearchPointersCache {
     console.debug(params);
 
     return new Promise(resolve => {
-      ddb.batchWriteItem(params, function(err, data) {
-        if (err) {
-          console.log("Error writing search pointers cache", err);
-          resolve(true);
-        } else {
-          console.log("Success writing search pointers cache", data);
-          resolve(false);
-        }
-      });
+      this.sendPutBatch(params, items, resolve);
     });
 
 
   }
 
-    isEmpty(obj) {
+  sendPutBatch(params, items, resolve) {
+
+    let self = this;
+
+    let sendItems = items;
+
+    if(items.length > 25) {
+      sendItems = items.slice(0,25);
+      items = items.slice(25,items.length - 1);
+    } else {
+      sendItems = items;
+      items = [];
+    }
+
+    params.RequestItems[tableName] = sendItems;
+
+    ddb.batchWriteItem(params, function(err, data) {
+        if (err) {
+          console.log("Error writing search pointers cache", err);
+          resolve(true);
+        } else {
+          console.log("Success writing search pointers cache", data);
+
+          if(items.length > 0) {
+            self.sendPutBatch(params, items, resolve);
+          } else {
+            resolve(false);
+          }
+
+        }
+      });
+
+
+  }
+
+  isEmpty(obj) {
     for(let key in obj) {
         if(obj.hasOwnProperty(key))
             return false;

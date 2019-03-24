@@ -1,11 +1,11 @@
 <div class="row">
-  <div class="col-12 col-sm-8">
+  <div class="col-12 col-sm-8 col-lg-10">
     <img src="assets/logo.png" id="logo" width="300"
       (click)="logoClick()"/>
 
   </div>
 
-  <div class="col-12 col-sm-4 menuRight">
+  <div class="col-12 col-sm-4 col-lg-2 menuRight">
 
     <div *ngIf="!isAuthenticated()">
           <a href="javascript:void(0);" (click)="login()"
@@ -16,4 +16,41 @@
     <a href="javascript:void(0);" (click)="logout()"
     *ngIf="isAuthenticated()">Log Out</a>
   </div>
+
+
 </div>
+
+<ng-template #socialWorkerCheckModal let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title" >Do you work with foster kids?</h4>
+  </div>
+  <div class="modal-body">
+    <p>People Search is for social workers and those that work directly with foster kids. If you do not work with foster kids, we'd love to tell you more about what we do. </p>
+  </div>
+  <div class="modal-footer justify-content-between">
+    <button type="button" class="btn btn-primary"  ngbAutofocus (click)="yesIAmASocialWorkerClick()">Yes, I work with foster kids</button>
+    <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="noIAmNotASocialWorkerClick()">Nope, that's not me</button>
+  </div>
+</ng-template>
+
+<ng-template #watchVideoModal let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title" >Two minutes for better results</h4>
+  </div>
+  <div class="modal-body">
+    <p>Before you start, we'd like you to watch a two minute video so that you know everything about People Search. </p>
+  </div>
+  <div class="modal-footer justify-content-between">
+    <button type="button" class="btn btn-primary"  ngbAutofocus (click)="openVideoClick()">Show me the video</button>
+    <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="dontWatchVideoClick()">Skip the video</button>
+  </div>
+</ng-template>
+
+<ng-template #videoModal let-c="close" let-d="dismiss">
+  <div class="modal-body">
+    <iframe  class="videoIframe" width="100%"  src="https://www.youtube.com/embed/0xsb2EfplaY?rel=0&autoplay=1&modestbranding=1&controls=1&wmode=transparent" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+  </div>
+  <div class="modal-footer justify-content-between">
+    <button type="button" class="btn btn-primary"  ngbAutofocus (click)="postWatchVideoSignUp()">Take me to sign up</button>
+  </div>
+</ng-template>

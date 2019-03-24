@@ -3,13 +3,13 @@ import { NgModule } from '@angular/core';
 
 import { AppRoutingModule } from './app-routing.module';
 
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import { NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import { HomeComponent } from './home/home.component';
 import { RootComponent } from './root/root.component';
-import {ReactiveFormsModule} from "@angular/forms";
-import {HttpClientModule} from "@angular/common/http";
+import { ReactiveFormsModule} from "@angular/forms";
+import { HttpClientModule} from "@angular/common/http";
 import { SearchComponent } from './search/search.component';
-import {AuthService} from "./auth-service.service";
+import { AuthService } from "./auth.service";
 import { HeaderComponent } from './header/header.component';
 import { CallbackComponent } from './callback/callback.component';
 import { AuthErrorComponent } from './auth-error/auth-error.component';
