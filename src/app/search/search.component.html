@@ -197,10 +197,10 @@
 
       <div class="col-12">
         <div class="row">
-          <div class="col-3">
+          <div class="col-3 col-sm-2">
 
           </div>
-          <div class="col-9">
+          <div class="col-9 col-sm-10">
             <h3>Possible Matches</h3>
           </div>
         </div>
@@ -208,12 +208,12 @@
         <div class="row possibleMatchRow"
           *ngFor="let person of searchResult.possible_persons"
           (click)="personClick(person)">
-          <div class="col-3">
+          <div class="col-3 col-sm-2">
             <a href="javascript:void(0)"><img src="{{generateThumbnailUrl(person)}}"
                  width="75" height="75"
                  /></a>
           </div>
-          <div class="col-9">
+          <div class="col-9 col-sm-10">
             <a href="javascript:void(0)"><span *ngIf="person.names != null"><strong>{{person.names[0]?.display}}</strong></span></a><br/>
             {{person.dob?.display}}<span *ngIf="person.dob != null && person.gender != null">,</span> {{person.gender?.content}}<br/>
             <span class="possibleMatchCityState" *ngFor="let cityState of uniqueCityStates(person.addresses)">
