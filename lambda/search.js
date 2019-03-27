@@ -11,6 +11,9 @@ const Cache = require('./search-cache.js');
 const SearchPointersCache = require('./search-pointers-cache');
 const CachePutRequest = require('./cache-put-request');
 const searchPointersCache = new SearchPointersCache();
+const HashMap = require('HashMap');
+
+
 
 const cache = new Cache();
 
@@ -170,7 +173,7 @@ function processPiplResponseBody(responseBody) {
 
   let response = JSON.parse(responseBody);
 
-  let putRequests = [];
+  let putRequests = new HashMap();
 
   if(response.possible_persons != null) {
       for(let possiblePerson of response.possible_persons) {
@@ -206,7 +209,7 @@ function processPiplResponseBody(responseBody) {
         possiblePerson["@search_pointer_hash"] = hash;
 
         // The hash to save in bulk
-        putRequests.push(new CachePutRequest(hash,possiblePerson["@search_pointer"]));
+        putRequests.set(hash,new CachePutRequest(hash,possiblePerson["@search_pointer"]));
       }
   }
 
@@ -216,14 +219,15 @@ function processPiplResponseBody(responseBody) {
 
   let bodyProcessed = JSON.stringify(response);
 
-  if(putRequests.length == 0) {
+  if(putRequests.size == 0) {
     return new Promise( resolve => {
       resolve(bodyProcessed)
     })
   }
 
   return new Promise(resolve => {
-    searchPointersCache.put(putRequests).then(
+
+    searchPointersCache.put(putRequests.values()).then(
       success => {
         // TODO what happens when the puts are not successful?
         // Need to use error catching
