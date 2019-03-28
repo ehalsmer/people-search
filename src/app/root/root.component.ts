@@ -36,7 +36,8 @@ export class RootComponent implements OnInit {
         let opts = window._sva = window._sva || {};
 
         opts.traits = {
-            "user_id": user["name"]
+            "user_id": user["name"],
+            "email": user["name"]
         };
       }
     );

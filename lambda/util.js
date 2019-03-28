@@ -56,6 +56,10 @@ module.exports = class HttpClientUtils {
       response.headers[key] = headers[key];
     });
 
+    if(statusCode != 200) {
+      console.error("There was an error. statusCode: " + statusCode + " body: " + body);
+    }
+
     callback(null, response);
 
   }
