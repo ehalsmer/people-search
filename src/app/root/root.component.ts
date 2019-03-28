@@ -32,13 +32,26 @@ export class RootComponent implements OnInit {
       (user) => {
         this.analytics.sendUserInfo(user["name"]);
 
-        // @ts-ignore
-        let opts = window._sva = window._sva || {};
+        if(user["name"] != "anonymous@unknown.org") {
 
-        opts.traits = {
-            "user_id": user["name"],
-            "email": user["name"]
-        };
+          // @ts-ignore
+          let opts = window._sva = window._sva || {};
+
+          opts.traits = {
+              "user_id": user["name"],
+              "email": user["name"]
+          };
+
+          let s = document.createElement('script');
+          s.src = '//survey.survicate.com/workspaces/8e9be799b0c965ff90b58c89ee13f75f/web_surveys.js';
+          s.async = true;
+          let e = document.getElementsByTagName('script')[0];
+          e.parentNode.insertBefore(s, e);
+
+        }
+
+
+
       }
     );
 
