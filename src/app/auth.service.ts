@@ -1,9 +1,9 @@
 import {Injectable, NgZone} from '@angular/core';
 import { Router } from '@angular/router';
 import * as auth0 from 'auth0-js';
-import { environment } from "../environments/environment";
-import {delay, mergeMap} from "rxjs/operators";
-import {Observable, of, timer} from "rxjs";
+import { environment } from '../environments/environment';
+import {delay, mergeMap} from 'rxjs/operators';
+import {Observable, of, timer} from 'rxjs';
 
 @Injectable()
 export class AuthService {
@@ -14,7 +14,7 @@ export class AuthService {
 
   public userProfile;
 
-  lastErrorMessage = "Unknown Error";
+  lastErrorMessage = 'Unknown Error';
 
   refreshSubscription: any;
 
@@ -42,9 +42,9 @@ export class AuthService {
     return this._idToken;
   }
 
-  public register():void {
+  public register(): void {
     this.auth0.authorize({
-      login_hint: "signUp"
+      login_hint: 'signUp'
     });
   }
 
@@ -63,12 +63,14 @@ export class AuthService {
 
         this.lastErrorMessage = err.errorDescription;
 
-        if(this.lastErrorMessage.indexOf("Please verify your email before logging in.") != -1)
-          this.router.navigate(["/verify-email"]);
-        else if(this.lastErrorMessage.indexOf("Access Denied") != -1)
-          this.router.navigate(["/request-access"]);
-        else
+        if (this.lastErrorMessage.indexOf('Please verify your email before logging in.') !== -1) {
+          this.logout('/verify-email');
+          // this.router.navigate(['/verify-email']);
+        } else if (this.lastErrorMessage.indexOf('Access Denied') !== -1) {
+          this.router.navigate(['/request-access']);
+        } else {
           this.router.navigate(['/auth-error']);
+        }
 
       }
     });
@@ -93,7 +95,7 @@ export class AuthService {
       if (authResult && authResult.accessToken && authResult.idToken) {
         this.localLogin(authResult);
       } else if (err) {
-        alert(`Could not get a new token (${err.error}: ${err.error_description}).`);
+        console.error(`Could not get a new token (${err.error}: ${err.error_description}).`);
         this.logout();
       }
     });
@@ -133,11 +135,11 @@ export class AuthService {
     }
   }
 
-  public logout(): void {
+  public logout(returnPath: string = '/logged-out'): void {
 
     this.auth0.logout({
       client_id: environment.AUTH0_CLIENT_ID,
-      returnTo: environment.APP_URL + "/logged-out"
+      returnTo: environment.APP_URL + returnPath
     });
 
     // Remove tokens and expiry time
@@ -148,7 +150,7 @@ export class AuthService {
     localStorage.removeItem('isLoggedIn');
     this.unscheduleRenewal();
     // Go back to the home route
-    //this.router.navigate(['/logged-out']);
+    // this.router.navigate(['/logged-out']);
   }
 
   public isAuthenticated(): boolean {
@@ -157,7 +159,7 @@ export class AuthService {
     return new Date().getTime() < this._expiresAt;
   }
 
-  public waitForUserProfile(timeout?:number):Promise<Object> {
+  public waitForUserProfile(timeout?: number): Promise<Object> {
     return new Promise(resolve => {
       this._ngZone.runOutsideAngular( () => {
         this.recurseWaitForUserProfile(resolve, timeout);
@@ -166,39 +168,38 @@ export class AuthService {
   }
 
 
-  public recurseWaitForUserProfile(resolve, timeout?:number) {
-    let self = this;
-    if(this.userProfile == null){
-        setTimeout(function() {self.recurseWaitForUserProfile(resolve, timeout)},timeout);
+  public recurseWaitForUserProfile(resolve, timeout?: number) {
+    const self = this;
+    if (this.userProfile == null) {
+        setTimeout(function() {self.recurseWaitForUserProfile(resolve, timeout); }, timeout);
     } else {
       // when while-loop breaks, resolve the promise to continue
       resolve(this.userProfile);
     }
   }
 
-  public waitForAuthReady():Promise<boolean> {
+  public waitForAuthReady(): Promise<boolean> {
     return new Promise(resolve => {
-      this._ngZone.runOutsideAngular(() => {this.recurseWaitForAuthReady(resolve)});
+      this._ngZone.runOutsideAngular(() => {this.recurseWaitForAuthReady(resolve); });
     });
   }
 
-  private recurseWaitForAuthReady(resolve):void {
-    let self = this;
-    if(localStorage.getItem('isLoggedIn') === 'true' && this._accessToken == ""){
+  private recurseWaitForAuthReady(resolve): void {
+    const self = this;
+    if (localStorage.getItem('isLoggedIn') === 'true' && this._accessToken == '') {
       setTimeout(function () {
-        self.recurseWaitForAuthReady(resolve)
-      }, 100)
-    }
-     else {
+        self.recurseWaitForAuthReady(resolve);
+      }, 100);
+    } else {
       // when while-loop breaks, resolve the promise to continue
       resolve(this.isAuthenticated());
     }
   }
 
 
-  public getProfile():Object {
+  public getProfile(): Object {
     if (this.userProfile) {
-      return this.userProfile
+      return this.userProfile;
     }
 
     if (!this._accessToken) {
@@ -206,7 +207,7 @@ export class AuthService {
       return;
     }
 
-    let self = this;
+    const self = this;
 
     return this.auth0.client.userInfo(this._accessToken, function (err, profile) {
       if (profile) {
