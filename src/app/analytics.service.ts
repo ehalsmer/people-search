@@ -15,6 +15,10 @@ export class AnalyticsService {
               private http: HttpClient) {}
 
   sendUserInfo(emailAddress:string) {
+
+    if(window.location.href.indexOf("localhost") !== -1)
+      return;
+
     this.emailAddress = emailAddress;
 
     let headers = new HttpHeaders();
@@ -35,6 +39,9 @@ export class AnalyticsService {
   }
 
   sendEvent(verb:string, noun:string, outcome?:string, options?:object) {
+
+    if(window.location.href.indexOf("localhost") !== -1)
+      return;
 
     if(this.emailAddress == null) {
       console.warn("User email unknown, not sending analytic event");

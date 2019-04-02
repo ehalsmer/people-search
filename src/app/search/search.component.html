@@ -207,14 +207,15 @@
 
         <div class="row possibleMatchRow"
           *ngFor="let person of searchResult.possible_persons"
-          (click)="personClick(person)">
+          (click)="personClick($event, person)">
           <div class="col-3 col-sm-2">
-            <a href="javascript:void(0)"><img src="{{generateThumbnailUrl(person)}}"
+            <a href="{{generatePersonLink(person)}}">
+              <img src="{{generateThumbnailUrl(person)}}"
                  width="75" height="75"
                  /></a>
           </div>
           <div class="col-9 col-sm-10">
-            <a href="javascript:void(0)"><span *ngIf="person.names != null"><strong>{{person.names[0]?.display}}</strong></span></a><br/>
+            <a href="{{generatePersonLink(person)}}"><span *ngIf="person.names != null"><strong>{{person.names[0]?.display}}</strong></span></a><br/>
             {{person.dob?.display}}<span *ngIf="person.dob != null && person.gender != null">,</span> {{person.gender?.content}}<br/>
             <span class="possibleMatchCityState" *ngFor="let cityState of uniqueCityStates(person.addresses)">
               {{cityState}}

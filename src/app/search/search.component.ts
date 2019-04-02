@@ -340,6 +340,10 @@ export class SearchComponent implements OnInit {
     this.router.navigate(["/"]);
   }
 
+  generatePersonLink(person) {
+    return '/search;person=' + person['@search_pointer_hash'];
+  }
+
   generateThumbnailUrl(person) {
     if(person.images == null || person.images.length == 0) {
       return environment.API_URL + "/api/thumbnail?tokens=none";
@@ -360,7 +364,16 @@ export class SearchComponent implements OnInit {
     return url;
   }
 
-  personClick(person) {
+  personClick($event, person) {
+
+    this.analytics.sendEvent("click","possible_person",null,
+        {
+          "possiblePersonIndex": index
+        }
+    );
+
+    if($event.shiftKey)
+      return;
 
     // Find the index of the person clicked
     let index = this.searchResult.possible_persons.indexOf(person);
