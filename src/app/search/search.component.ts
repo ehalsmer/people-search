@@ -366,6 +366,9 @@ export class SearchComponent implements OnInit {
 
   personClick($event, person) {
 
+    // Find the index of the person clicked
+    const index = this.searchResult.possible_persons.indexOf(person);
+
     this.analytics.sendEvent("click","possible_person",null,
         {
           "possiblePersonIndex": index
@@ -375,8 +378,7 @@ export class SearchComponent implements OnInit {
     if($event.shiftKey)
       return;
 
-    // Find the index of the person clicked
-    let index = this.searchResult.possible_persons.indexOf(person);
+
 
     this.analytics.sendEvent("click","possible_person",null,
         {
