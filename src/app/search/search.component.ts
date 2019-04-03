@@ -375,7 +375,8 @@ export class SearchComponent implements OnInit {
         }
     );
 
-    if($event.shiftKey)
+    if($event.shiftKey
+        || $event.metaKey)
       return;
 
 
