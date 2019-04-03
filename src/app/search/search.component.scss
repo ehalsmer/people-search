@@ -8,7 +8,7 @@
 }
 
 .searchRow {
-  margin-top: 2em;
+  margin-top: 0.5em;
   margin-bottom: 2em;
 }
 
@@ -159,3 +159,21 @@
 .personName{
   font-weight: bold;
 }
+
+.searchType {
+    margin-top: 1.5em;
+
+  a {
+    margin-left: 2em;
+  }
+}
+
+.selectedSearchType {
+  color: black;
+  font-weight: 600;
+  &:hover {
+    text-decoration: none;
+    cursor: inherit;
+  }
+}
+

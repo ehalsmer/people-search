@@ -20,6 +20,9 @@ export class SearchComponent implements OnInit {
   ViewState = ViewState;
   viewState = ViewState.NO_SEARCH;
 
+  SearchType = SearchType;
+  searchType = SearchType.NAME;
+
   @ViewChild('header') header:HeaderComponent;
 
   searchForm = new FormGroup({
@@ -515,6 +518,37 @@ export class SearchComponent implements OnInit {
     return this.auth.isAuthenticated();
   }
 
+  setSearchType(searchType: SearchType) {
+
+    if (this.searchType === searchType) {
+      return;
+    }
+
+    this.searchForm.get('searchInput').reset();
+    this.searchForm.get('locationInput').reset();
+
+    this.searchType = searchType;
+  }
+
+  generateSearchHint(searchType:SearchType) {
+    if(searchType == SearchType.PHONE)
+      return "Phone any format, no letters";
+
+    if(searchType == SearchType.ADDRESS)
+      return "Mailing address";
+
+    if(searchType == SearchType.NAME)
+      return "First and last, middle optional";
+
+    if(searchType == SearchType.URL)
+      return "Social profile link or any URL";
+
+        if(searchType == SearchType.EMAIL)
+      return "Email address";
+
+    return "Unknown";
+  }
+
 }
 
 
@@ -524,4 +558,12 @@ enum ViewState {
   SEARCH_RESULT,
   SEARCH_ERROR,
   NO_RESULTS
+}
+
+enum SearchType {
+  NAME,
+  EMAIL,
+  ADDRESS,
+  PHONE,
+  URL
 }
