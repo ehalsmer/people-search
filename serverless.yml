@@ -85,6 +85,22 @@ functions:
     events:
       - http: ANY {proxy+}
       - http: ANY /
+  searchv2:
+    handler: lambda/search-v2.query
+    events:
+      - http:
+          path: api/search-v2
+          method: POST
+          cors: true
+          request:
+            template:
+              application/json: >
+                {
+                  "q" : "$input.params('q')"
+                }
+          response:
+            headers:
+              Content-Type: "application/json"
   query:
     handler: lambda/search.query
     events:
