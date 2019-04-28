@@ -1,6 +1,8 @@
 'use strict';
 
-// search.js
+// TEST QUERY
+// AWS_PROFILE=cok SLS_DEBUG=* serverless invoke local -X -f query --data '{ "body": {"q":"travis@dreamingwell.com"}}'
+
 const request = require('then-request');
 const fs = require('fs');
 const jwt = require( 'jsonwebtoken');
@@ -92,7 +94,7 @@ exports.query = (event, context, callback) => {
 
   console.debug(event);
 
-  let queryParameters = httpClientUtils.getQueryParameters(event);
+  let queryParameters = getQueryParameters(event);
 
   console.debug("Query Parameters");
   console.debug(queryParameters);
@@ -104,6 +106,7 @@ exports.query = (event, context, callback) => {
      makeQueryParts(queryParameters)
        .then(queryParts =>{
 
+         console.log("Query parts");
          console.log(queryParts);
 
          let queryBody = makeQueryBody(queryParts);
@@ -401,3 +404,18 @@ function validateUserName(username) {
     }
     return true;
 }
+
+
+function getQueryParameters(event) {
+    if(event.isBase64Encoded) {
+      let queryParametersString = new Buffer(event.body,"base64").toString("ascii") ;
+
+      console.debug("Query Parameters String");
+      console.debug(queryParametersString);
+
+      return JSON.parse(queryParametersString.toString());
+    } else {
+      console.debug("found body");
+      return event.body;
+    }
+  }
