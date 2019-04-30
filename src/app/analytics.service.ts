@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { AuthService } from "./auth.service";
-import { HttpClient, HttpHeaders} from "@angular/common/http";
-import { environment} from "../environments/environment";
+import { AuthService } from './auth.service';
+import { HttpClient, HttpHeaders} from '@angular/common/http';
+import { environment} from '../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -9,67 +9,70 @@ import { environment} from "../environments/environment";
 export class AnalyticsService {
 
 
-  private emailAddress:string = "anonymous@unknown.org";
+  private emailAddress = 'anonymous@unknown.org';
 
-  constructor(private auth:AuthService,
+  constructor(private auth: AuthService,
               private http: HttpClient) {}
 
-  sendUserInfo(emailAddress:string) {
+  sendUserInfo(emailAddress: string) {
 
-    if(window.location.href.indexOf("localhost") !== -1)
+    if (window.location.href.indexOf('localhost') !== -1) {
       return;
+    }
 
     this.emailAddress = emailAddress;
 
-    let headers = new HttpHeaders();
-    headers.set("Content-Type","application/json; charset=utf-8");
+    const headers = new HttpHeaders();
+    headers.set('Content-Type', 'application/json; charset=utf-8');
 
-    let bodyObject = new Object();
-    bodyObject["emailAddress"] = emailAddress;
+    const bodyObject = new Object();
+    bodyObject['emailAddress'] = emailAddress;
 
     this.http.post(
-      environment.API_URL + "/api/sendUserInfo",
+      environment.API_URL + '/api/sendUserInfo',
       JSON.stringify(bodyObject),
       {headers: headers}
     ).subscribe(
       (response) => {},
-      (error) => {console.log(error)}
+      (error) => {console.log(error); }
     );
 
   }
 
-  sendEvent(verb:string, noun:string, outcome?:string, options?:object) {
+  sendEvent(verb: string, noun: string, outcome?: string, options?: object) {
 
-    if(window.location.href.indexOf("localhost") !== -1)
-      return;
-
-    if(this.emailAddress == null) {
-      console.warn("User email unknown, not sending analytic event");
+    if (window.location.href.indexOf('localhost') !== -1) {
       return;
     }
 
-    let headers = new HttpHeaders();
-    headers.set("Content-Type","application/json; charset=utf-8");
-
-    let bodyObject = new Object();
-    bodyObject["event"] = verb + "-" + noun;
-
-    if(outcome != null) {
-      bodyObject["event"] += "-" + outcome;
+    if (this.emailAddress == null) {
+      console.warn('User email unknown, not sending analytic event');
+      return;
     }
 
-    bodyObject["emailAddress"] = this.emailAddress;
+    const headers = new HttpHeaders();
+    headers.set('Content-Type', 'application/json; charset=utf-8');
 
-    if(options != null)
-      bodyObject["options"] = options;
+    const bodyObject = new Object();
+    bodyObject['event'] = verb + '-' + noun;
+
+    if (outcome != null) {
+      bodyObject['event'] += '-' + outcome;
+    }
+
+    bodyObject['emailAddress'] = this.emailAddress;
+
+    if (options != null) {
+      bodyObject['options'] = options;
+    }
 
     this.http.post(
-      environment.API_URL + "/api/sendEvent",
+      environment.API_URL + '/api/sendEvent',
       JSON.stringify(bodyObject),
       {headers: headers}
     ).subscribe(
       (response) => {},
-      (error) => {console.log(error)}
+      (error) => {console.log(error); }
     );
   }
 

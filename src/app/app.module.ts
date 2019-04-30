@@ -20,6 +20,7 @@ import { LoggedOutComponent } from './logged-out/logged-out.component';
 import { TermsComponent } from './terms/terms.component';
 import { PrivacyComponent } from './privacy/privacy.component';
 import { FooterComponent } from './footer/footer.component';
+import { SearchFormComponent } from './search-form/search-form.component';
 
 @NgModule({
   declarations: [
@@ -35,7 +36,8 @@ import { FooterComponent } from './footer/footer.component';
     LoggedOutComponent,
     TermsComponent,
     PrivacyComponent,
-    FooterComponent
+    FooterComponent,
+    SearchFormComponent
   ],
   imports: [
     BrowserModule,

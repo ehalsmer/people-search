@@ -1,0 +1,94 @@
+@import '../scss-util/mixins';
+
+
+.searchRow {
+  margin-top: 0.5em;
+  margin-bottom: 2em;
+}
+
+.searchType {
+    margin-top: 1.5em;
+
+  a {
+    margin-left: 2em;
+    cursor: pointer;
+  }
+}
+
+.selectedSearchType {
+  color: black;
+  font-weight: 600;
+  &:hover {
+    text-decoration: none;
+    cursor: inherit;
+  }
+}
+
+
+
+.searchFormInputsWrapper {
+  border: 1px solid #dae1ea;
+  background: #fff;
+  border-radius: 4px;
+  padding: 0px 10px;
+  margin-bottom: 10px;
+}
+
+.searchInputWrapper,
+.locationInputWrapper {
+  height: 3em;
+
+  input {
+    width: 100%;
+  }
+}
+.searchFormInputsWrapper input[type=text] {
+    font-size: 2em;
+    font-weight: 400;
+    height: 100%;
+    border: none;
+    border-radius: 4px;
+    outline: none;
+    width: 100%;
+
+  @include respond-below(sm) {
+    font-size: 1em;
+  }
+
+}
+
+@include respond-above(md) {
+  .locationInputWrapper {
+    border-left: rgb(218, 225, 234) 1px solid;
+  }
+}
+
+.searchButtonWrapper {
+    vertical-align: top;
+    display: inline-block;
+    max-width: 80px;
+    height: 48px;
+
+}
+
+.searchButton {
+  height: 50px;
+  margin-right: 15px;
+}
+
+.searchButton.btn-primary {
+      border: 1px solid rgb(80,141,179);
+
+}
+
+.searchButtonWrapper button {
+    width: 100%;
+    max-width: 200px;
+    height: 100%;
+    border: 1px solid rgb(80,141,179);
+    border-radius: 3px;
+    cursor: pointer;
+    z-index: 2;
+
+
+}

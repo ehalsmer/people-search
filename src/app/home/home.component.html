@@ -6,49 +6,7 @@
     <div class="col-12">
       <app-header></app-header>
 
-      <div class="row searchRow">
-        <div class="col-md-12 col-lg-10 ">
-            <form [formGroup]="searchForm" (ngSubmit)="onSearch()">
-              <div class="row">
-
-                <div class="col-12">
-                  <div class="searchFormInputsWrapper">
-                    <div class="row">
-                      <div class="col-md-12 col-lg-8 searchInputWrapper">
-                        <input type="text"
-                               #searchInput
-                               formControlName="searchInput"
-                               class="searchInput"
-                               placeholder="Full Name, Email, Phone, or URL"
-                               (keyup.enter)="onSearch()"
-                               autofocus
-                        />
-                      </div>
-                      <div class="col-md-12 col-lg-4 locationInputWrapper">
-                        <input type="text"
-                               formControlName="locationInput"
-                               class="locationInput"
-                               placeholder="City, State"
-                               (keyup.enter)="onSearch()"
-/>
-                      </div>
-                    </div>
-
-                  </div>
-                </div>
-
-              </div>
-
-            </form>
-
-        </div>
-        <div class="col-md-12 col-lg-2">
-          <span class="searchButtonWrapper">
-            <button type="button" class="btn btn-primary" (click)="onSearch()">Search</button>
-          </span>
-        </div>
-      </div>
-
+      <app-search-form></app-search-form>
 
 
       <div class="row">
