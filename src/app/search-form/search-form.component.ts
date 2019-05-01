@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
-import {ActivatedRoute, Router} from '@angular/router';
+import {ActivatedRoute, ParamMap, Params, Router} from '@angular/router';
 import {AuthService} from '../auth.service';
 import {EnumValue} from '@angular/compiler-cli/src/ngtsc/metadata';
 
@@ -37,7 +37,6 @@ export class SearchFormComponent implements OnInit {
 
   SearchType = SearchType;
   searchType = SearchType.NAME;
-
 
   constructor(
     private route: ActivatedRoute,
@@ -123,11 +122,10 @@ export class SearchFormComponent implements OnInit {
 
   parametersChanged(params) {
 
-
     if (params['t'] != null) {
       this.searchType = params['t'];
     } else {
-      this.router.navigate(['/']);
+      //this.router.navigate(['/']);
     }
 
     switch (this.searchType) {
@@ -152,11 +150,19 @@ export class SearchFormComponent implements OnInit {
         this.parametersChangedPhone(params);
         break;
 
+      case SearchType.PERSON:
+        this.parametersChangedPerson(params)
+        break;
+
       default:
         console.error('Unknown type:' + this.searchType);
 
     }
 
+
+  }
+
+  parametersChangedPerson(params: String[]) {
 
   }
 
@@ -232,11 +238,16 @@ export class SearchFormComponent implements OnInit {
     return title;
   }
 
-  getSearchObject() {
+
+  getSearchObject(parameters: Params) {
+
+    if (parameters['person'] != null) {
+      return {search_pointer_hash: parameters['person']};
+    }
 
     let searchType = null;
 
-    const searchTypeString: string = this.route.paramMap.source.getValue()['t'];
+    const searchTypeString: string = parameters['t'];
 
     if ( searchTypeString != null ) {
       searchType = this.SearchType[searchTypeString.toUpperCase()];
@@ -250,30 +261,36 @@ export class SearchFormComponent implements OnInit {
 
     if ( searchType === SearchType.NAME) {
 
-      searchObject = { names: [{raw: this.route.paramMap.source.getValue()['m']}]};
+      searchObject = { names: [{raw: parameters['m']}]};
 
-      const locationValue = this.route.paramMap.source.getValue()['l'];
+      const locationValue = parameters['l'];
 
       if (locationValue != null
         && locationValue !== '') {
         searchObject['addresses'] = [{raw: locationValue}];
       }
 
+      if ( parameters['r'] != null ) {
+        searchObject['relationships'] = [{names: [{raw: parameters['r']}]}];
+      }
+
     } else if ( searchType === SearchType.EMAIL) {
 
-      searchObject = { emails: [{address: this.route.paramMap.source.getValue()['m']}]};
+      searchObject = { emails: [{address: parameters['m']}]};
 
     }  else if ( searchType === SearchType.PHONE) {
 
-      searchObject = { phones: [{number: this.route.paramMap.source.getValue()['m']}]};
+      const phoneNumbersOnly = (<String> parameters['m']).replace(/[^0-9\.]+/g, '')
+
+      searchObject = { phones: [{number: phoneNumbersOnly}]};
 
     }  else if ( searchType === SearchType.ADDRESS) {
 
-      searchObject = { addresses: [{raw: this.route.paramMap.source.getValue()['m']}]};
+      searchObject = { addresses: [{raw: parameters['m']}]};
 
     }  else if ( searchType === SearchType.ADDRESS) {
 
-      searchObject = { addresses: [{raw: this.route.paramMap.source.getValue()['m']}]};
+      searchObject = { addresses: [{raw: parameters['m']}]};
 
     }
 
@@ -286,7 +303,7 @@ export class SearchFormComponent implements OnInit {
 }
 
 
-enum SearchType {
+export enum SearchType {
   NAME = 'name',
   EMAIL = 'email',
   ADDRESS = 'address',

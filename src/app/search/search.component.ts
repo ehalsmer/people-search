@@ -8,7 +8,7 @@ import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {AnalyticsService} from '../analytics.service';
 import {Title} from '@angular/platform-browser';
 import {HeaderComponent} from '../header/header.component';
-import {SearchFormComponent} from '../search-form/search-form.component';
+import {SearchFormComponent, SearchType} from '../search-form/search-form.component';
 
 @Component({
   selector: 'app-search',
@@ -18,8 +18,15 @@ import {SearchFormComponent} from '../search-form/search-form.component';
 export class SearchComponent implements OnInit {
 
 
+  ModalResult = ModalResult;
+
   ViewState = ViewState;
   viewState = ViewState.NO_SEARCH;
+
+  @ViewChild('urlActionModal') urlActionModal: NgbModal;
+  @ViewChild('addressActionModal') addressActionModal: NgbModal;
+  @ViewChild('emailActionModal') emailActionModal: NgbModal;
+  @ViewChild('phoneActionModal') phoneActionModal: NgbModal;
 
   @ViewChild('header') header: HeaderComponent;
   @ViewChild('searchForm') searchForm: SearchFormComponent;
@@ -50,14 +57,14 @@ export class SearchComponent implements OnInit {
   parametersChanged(params) {
 
     this.viewState = ViewState.SEARCH_LOADING;
-    const searchObject = this.searchForm.getSearchObject();
+
+    const searchObject = this.searchForm.getSearchObject(params);
 
     // Wait until the authentication time is ready
     this.auth.waitForAuthReady().then(
       authenticated => {
       this.fetchSearchPostWaitForAuth(searchObject, authenticated);
     });
-
   }
 
   fetchSearchPostWaitForAuth(searchObject, authenticated) {
@@ -69,7 +76,11 @@ export class SearchComponent implements OnInit {
       requestObject['idToken'] = this.auth.idToken;
     }
 
-    requestObject['person'] = encodeURI(JSON.stringify(searchObject));
+    if (searchObject['search_pointer_hash'] != null) {
+      requestObject['search_pointer_hash'] = searchObject['search_pointer_hash'];
+    } else {
+          requestObject['person'] = encodeURI(JSON.stringify(searchObject));
+    }
 
     const searchUrl = environment.API_URL + '/api/search-v2';
 
@@ -226,7 +237,12 @@ export class SearchComponent implements OnInit {
         }
     );
 
-    this.router.navigate(['/search', { q: relationship.names[0].display}]);
+
+    let personName = this.searchResult.person.names[0].first;
+    personName += ' ' + this.searchResult.person.names[0].last;
+
+
+    this.router.navigate(['/search', { t: SearchType.NAME, m: relationship.names[0].display, r: personName}]);
 
     window.scroll(0, 0);
 
@@ -346,14 +362,6 @@ export class SearchComponent implements OnInit {
             return;
     }
 
-
-
-    this.analytics.sendEvent('click', 'possible_person', null,
-        {
-          'possiblePersonIndex': index
-        }
-    );
-
     this.router.navigate(['/search', { person: person['@search_pointer_hash']}]);
 
   }
@@ -369,74 +377,150 @@ export class SearchComponent implements OnInit {
 
     const index = this.searchResult.person.urls.indexOf(url);
 
-    this.analytics.sendEvent('click', 'person_url', null,
-        {
-          'urlIndex': index
-        }
-    );
-
     if (!this.auth.isAuthenticated()) {
       this.header.openSocialWorkerCheckModal();
       return;
     }
 
-    window.open(url.url, '_blank');
+    this.modal.open(this.urlActionModal, {backdrop: 'static'}).result.then(
+      result => {
+        if ( result === ModalResult.ACTION ) {
+
+          this.analytics.sendEvent('click', 'person_url_view', null,
+              {
+                'urlIndex': index
+              }
+          );
+
+          window.open(url.url, '_blank');
+        } else {
+
+          this.analytics.sendEvent('click', 'person_url_search', null,
+              {
+                'urlIndex': index
+              }
+          );
+
+          this.router.navigate(['/search', {t: SearchType.URL, m: url.url}]);
+
+        }
+      }
+    ).catch(e => {
+        console.log(e);
+    });
 
   }
 
   addressClick(address) {
-
     const index = this.searchResult.person.addresses.indexOf(address);
-
-    this.analytics.sendEvent('click', 'person_address', null,
-        {
-          'addressIndex': index
-        }
-    );
 
     if (!this.auth.isAuthenticated()) {
       this.header.openSocialWorkerCheckModal();
       return;
     }
 
-    window.open('https://www.google.com/maps/search/?api=1&query=' + address.display, '_blank');
+    this.modal.open(this.addressActionModal, {backdrop: 'static'}).result.then(
+      result => {
+        if ( result === ModalResult.ACTION ) {
+
+          this.analytics.sendEvent('click', 'person_address_view', null,
+              {
+                'addressIndex': index
+              }
+          );
+
+          window.open('https://www.google.com/maps/search/?api=1&query=' + address.display, '_blank');
+
+        } else {
+
+          this.analytics.sendEvent('click', 'person_address_search', null,
+              {
+                'addressIndex': index
+              }
+          );
+
+          this.router.navigate(['/search', {t: SearchType.ADDRESS, m: address.display}]);
+
+        }
+      }
+    ).catch(e => {
+        console.log(e);
+    });
 
   }
 
   emailClick(email) {
-
     const index = this.searchResult.person.emails.indexOf(email);
-
-    this.analytics.sendEvent('click', 'person_email', null,
-        {
-          'emailIndex': index
-        }
-    );
 
     if (!this.auth.isAuthenticated()) {
       this.header.openSocialWorkerCheckModal();
       return;
     }
 
-    window.location.href = 'mailto:' + email.display;
+    this.modal.open(this.emailActionModal, {backdrop: 'static'}).result.then(
+      result => {
+        if ( result === ModalResult.ACTION ) {
+
+        this.analytics.sendEvent('click', 'person_email_send', null,
+            {
+              'emailIndex': index
+            }
+        );
+
+        window.location.href = 'mailto:' + email.address;
+
+        } else {
+
+          this.analytics.sendEvent('click', 'person_email_search', null,
+              {
+                'emailIndex': index
+              }
+          );
+
+          this.router.navigate(['/search', {t: SearchType.EMAIL, m: email.address}]);
+
+        }
+      }
+    ).catch(e => {
+        console.log(e);
+    });
+
   }
 
   phoneClick(phone) {
-
     const index = this.searchResult.person.phones.indexOf(phone);
-
-    this.analytics.sendEvent('click', 'person_phone', null,
-        {
-          'phoneIndex': index
-        }
-    );
 
     if (!this.auth.isAuthenticated()) {
       this.header.openSocialWorkerCheckModal();
       return;
     }
 
-    window.location.href = 'tel:' + phone.country_code + ' ' + phone.display;
+    this.modal.open(this.phoneActionModal, {backdrop: 'static'}).result.then(
+      result => {
+        if ( result === ModalResult.ACTION ) {
+
+          this.analytics.sendEvent('click', 'person_phone_call', null,
+              {
+                'phoneIndex': index
+              }
+          );
+
+          window.location.href = 'tel:' + phone.country_code + ' ' + phone.display;
+
+        } else {
+          this.analytics.sendEvent('click', 'person_phone_search', null,
+              {
+                'phoneIndex': index
+              }
+          );
+
+          this.router.navigate(['/search', {t: SearchType.PHONE, m: phone.display}]);
+        }
+      }
+    ).catch(e => {
+        console.log(e);
+    });
+
   }
 
   generateAddressHomeStreetDisplay(address) {
@@ -488,6 +572,11 @@ export class SearchComponent implements OnInit {
 
 }
 
+
+enum ModalResult {
+  ACTION,
+  SEARCH
+}
 
 enum ViewState {
   NO_SEARCH,

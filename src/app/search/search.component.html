@@ -194,3 +194,54 @@
 
 </div>
 
+<ng-template #urlActionModal let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">View or Search?</h4>
+  </div>
+  <div class="modal-body">
+    <p>Would you like to view this URL, or perform a search on it?</p>
+  </div>
+  <div class="modal-footer justify-content-between" >
+    <button type="button" class="btn btn-primary"  ngbAutofocus (click)="c(ModalResult.ACTION)">View the URL</button>
+    <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="c(ModalResult.SEARCH)">Perform a search</button>
+  </div>
+</ng-template>
+
+<ng-template #addressActionModal let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">View or Search?</h4>
+  </div>
+  <div class="modal-body">
+    <p>Would you like to view this address on a map, or perform a search on it?</p>
+  </div>
+  <div class="modal-footer justify-content-between" >
+    <button type="button" class="btn btn-primary"  ngbAutofocus (click)="c(ModalResult.ACTION)">View on map</button>
+    <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="c(ModalResult.SEARCH)">Perform a search</button>
+  </div>
+</ng-template>
+
+<ng-template #emailActionModal let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Send Email or Search?</h4>
+  </div>
+  <div class="modal-body">
+    <p>Would you like to send an email, or perform a search?</p>
+  </div>
+  <div class="modal-footer justify-content-between" >
+    <button type="button" class="btn btn-primary"  ngbAutofocus (click)="c(ModalResult.ACTION)">Send Email</button>
+    <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="c(ModalResult.SEARCH)">Perform a search</button>
+  </div>
+</ng-template>
+
+<ng-template #phoneActionModal let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Call or Search?</h4>
+  </div>
+  <div class="modal-body">
+    <p>Would you like to call this number, or perform a search? Calling requires a device capable of dialing phone numbers.</p>
+  </div>
+  <div class="modal-footer justify-content-between" >
+    <button type="button" class="btn btn-primary"  ngbAutofocus (click)="c(ModalResult.ACTION)">Call this number</button>
+    <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="c(ModalResult.SEARCH)">Perform a search</button>
+  </div>
+</ng-template>
