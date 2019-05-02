@@ -94,8 +94,7 @@ export class SearchComponent implements OnInit {
     );
 
     responseObservable.subscribe( (response ) => {
-      console.debug('Response');
-      console.debug(response);
+
       this.searchResult = response;
 
       if (this.searchResult.person == null
@@ -230,6 +229,11 @@ export class SearchComponent implements OnInit {
   relationshipClick(relationship) {
 
     const index = this.searchResult.person.relationships.indexOf(relationship);
+
+    if (!this.auth.isAuthenticated()) {
+      this.header.openSocialWorkerCheckModal();
+      return;
+    }
 
     this.analytics.sendEvent('click', 'relationship', null,
         {
@@ -523,6 +527,14 @@ export class SearchComponent implements OnInit {
 
   }
 
+  generateRelationshipDisplay(relationship) {
+    if (!this.auth.isAuthenticated()) {
+      return '**** ********* **';
+    }
+
+    return relationship.names[0]['display'];
+  }
+
   generateAddressHomeStreetDisplay(address) {
     if (!this.auth.isAuthenticated()) {
       return '**** ********* **';
@@ -549,7 +561,7 @@ export class SearchComponent implements OnInit {
 
   generateAddressZipcodeDisplay(address) {
     if (!this.auth.isAuthenticated()) {
-      return '****';
+      return '*****';
     }
 
     return address.zip_code;

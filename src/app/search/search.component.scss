@@ -10,6 +10,7 @@
 
 .personResultWrapper {
 
+
   > div.row {
     margin-bottom: 2em;
 
@@ -37,6 +38,11 @@
   margin-top: 1em;
   cursor: pointer;
   padding: 5px 0px;
+
+
+  :hover {
+    cursor: pointer;
+  }
 
   @include respond-above(md) {
       > div:first-child > a {

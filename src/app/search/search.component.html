@@ -144,9 +144,9 @@
         <div class="col-sm-3 sectionLabel">Relationships</div>
         <div class="col-sm-9">
           <div class="dataRow" *ngFor="let relationship of filterRelationships(searchResult.person?.relationships); let in = index">
-            <a href="javascript:void(0)" (click)="relationshipClick(relationship)" target="_blank">{{relationship.names[0]["display"]}}</a>
+            <a href="javascript:void(0)" (click)="relationshipClick(relationship)" target="_blank">{{generateRelationshipDisplay(relationship)}}</a>
             <div class="metaData">
-              <span *ngIf="relationship['@type'] != null">{{relationship["@type"]}}</span>
+              <span *ngIf="authenticated() && relationship['@type'] != null">{{relationship["@type"]}}</span>
             </div>
           </div>
         </div>

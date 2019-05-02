@@ -1,8 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {ActivatedRoute, ParamMap, Params, Router} from '@angular/router';
-import {AuthService} from '../auth.service';
-import {EnumValue} from '@angular/compiler-cli/src/ngtsc/metadata';
 
 @Component({
   selector: 'app-search-form',
@@ -16,22 +14,6 @@ export class SearchFormComponent implements OnInit {
     main: new FormControl('', Validators.minLength(1)),
     location: new FormControl('')
   });
-
-  //  addressSearchForm = new FormGroup({
-//    address: new FormControl('', Validators.minLength(1))
-//  });
-//  });
-//  emailSearchForm = new FormGroup({
-//    email: new FormControl('', Validators.email)
-//  });
-//  });
-//  phoneNumberSearchForm = new FormGroup({
-//    phoneNumber: new FormControl('', Validators.minLength(10))
-//  });
-//  });
-//  urlSearchForm = new FormGroup({
-//    url: new FormControl('', Validators.pattern('/^(?:(?:https?|ftp):\/\/)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/\S*)?$/;'))
-//  });
 
   private sub = null;
 
@@ -95,7 +77,7 @@ export class SearchFormComponent implements OnInit {
   onSearchUrl() {
     const url = this.searchForm.get('main').value;
 
-    this.router.navigate(['/search', { m: name, t: this.searchType.toString()}]);
+    this.router.navigate(['/search', { m: encodeURI(url), t: this.searchType.toString()}]);
 
   }
 
@@ -125,7 +107,7 @@ export class SearchFormComponent implements OnInit {
     if (params['t'] != null) {
       this.searchType = params['t'];
     } else {
-      //this.router.navigate(['/']);
+      this.searchType = SearchType.NAME;
     }
 
     switch (this.searchType) {
@@ -151,7 +133,7 @@ export class SearchFormComponent implements OnInit {
         break;
 
       case SearchType.PERSON:
-        this.parametersChangedPerson(params)
+        this.parametersChangedPerson(params);
         break;
 
       default:
@@ -288,14 +270,11 @@ export class SearchFormComponent implements OnInit {
 
       searchObject = { addresses: [{raw: parameters['m']}]};
 
-    }  else if ( searchType === SearchType.ADDRESS) {
+    }  else if ( searchType === SearchType.URL) {
 
-      searchObject = { addresses: [{raw: parameters['m']}]};
+      searchObject = { urls: [{url: decodeURI(parameters['m'])}]};
 
     }
-
-    console.debug('Search Object for ' + searchType);
-    console.debug(searchObject);
 
     return searchObject;
 
