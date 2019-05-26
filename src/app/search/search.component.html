@@ -2,7 +2,7 @@
 
   <app-header #header></app-header>
 
-  <app-search-form #searchForm></app-search-form>
+  <app-search-form #searchForm (searchUpdated)="searchFormUpdated()"></app-search-form>
 
   <div class="row"
     *ngIf="viewState == ViewState.SEARCH_RESULT && searchResult.warnings != null">

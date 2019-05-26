@@ -76,9 +76,11 @@ module.exports = class HttpClientUtils {
       return false;
 
     let numbersOnly = phone.replace(/\D/g,'');
-    if(numbersOnly.length == 9 || numbersOnly.length == 10) {
-      return true;
+    if(numbersOnly.length < 10 ) {
+      return false;
     }
+
+    return true;
 
   }
 

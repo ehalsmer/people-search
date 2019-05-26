@@ -1,4 +1,4 @@
-import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, EventEmitter, OnInit, Output, ViewChild} from '@angular/core';
 import {environment} from '../../environments/environment';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
@@ -31,6 +31,8 @@ export class SearchComponent implements OnInit {
   @ViewChild('header') header: HeaderComponent;
   @ViewChild('searchForm') searchForm: SearchFormComponent;
 
+
+
   searchResult = null;
 
   private sub = null;
@@ -52,19 +54,27 @@ export class SearchComponent implements OnInit {
     });
   }
 
-
-
-  parametersChanged(params) {
+  searchFormUpdated() {
 
     this.viewState = ViewState.SEARCH_LOADING;
 
-    const searchObject = this.searchForm.getSearchObject(params);
+    const searchValidationResult = this.searchForm.validateSearch();
+
+    if (!searchValidationResult.valid) {
+      return;
+    }
+
+    const searchObject = this.searchForm.getSearchObject(searchValidationResult);
 
     // Wait until the authentication time is ready
     this.auth.waitForAuthReady().then(
       authenticated => {
       this.fetchSearchPostWaitForAuth(searchObject, authenticated);
     });
+  }
+
+
+  parametersChanged(params) {
   }
 
   fetchSearchPostWaitForAuth(searchObject, authenticated) {
