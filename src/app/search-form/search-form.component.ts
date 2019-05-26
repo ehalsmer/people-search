@@ -21,7 +21,10 @@ export class SearchFormComponent implements OnInit {
   SearchType = SearchType;
   searchType = SearchType.NAME;
 
+  relationshipName = null;
+
   private lastParams = {};
+
 
   constructor(
     private route: ActivatedRoute,
@@ -116,6 +119,7 @@ export class SearchFormComponent implements OnInit {
   parametersChanged(params) {
 
     this.searchType = this.detectInputType(params);
+    this.relationshipName = params['r'];
 
     switch (this.searchType) {
 
@@ -156,6 +160,7 @@ export class SearchFormComponent implements OnInit {
   }
 
   parametersChangedPerson(params: String[]) {
+
 
   }
 
@@ -325,11 +330,19 @@ export class SearchFormComponent implements OnInit {
       return SearchType.NAME;
     }
 
-    return null;
+
+
+    return this.getSearchTypeFromParams(parameters);
 
   }
 
   getSearchTypeFromParams(parameters: Params) {
+
+
+    if ( parameters['t'] == null) {
+      return SearchType.NAME;
+    }
+
     let searchType = null;
 
     const searchTypeString: string = parameters['t'];

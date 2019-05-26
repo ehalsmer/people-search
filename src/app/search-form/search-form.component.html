@@ -9,6 +9,7 @@
   </div>
 </div>
 <div class="row searchRow">
+
       <div class="col-md-12 col-lg-9 ">
           <form [formGroup]="searchForm" (ngSubmit)="onSearch()" >
 
@@ -38,6 +39,12 @@
                   </div>
 
                 </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-12" *ngIf="relationshipName != null">
+                Relationship with {{relationshipName}}
               </div>
             </div>
 
