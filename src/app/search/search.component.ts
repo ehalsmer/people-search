@@ -1,6 +1,5 @@
-import {Component, ElementRef, EventEmitter, OnInit, Output, ViewChild} from '@angular/core';
+import {Component, ElementRef, EventEmitter, Inject, OnInit, Output, ViewChild} from '@angular/core';
 import {environment} from '../../environments/environment';
-import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {ActivatedRoute, Router} from '@angular/router';
 import {AuthService} from '../auth.service';
@@ -9,6 +8,10 @@ import {AnalyticsService} from '../analytics.service';
 import {Title} from '@angular/platform-browser';
 import {HeaderComponent} from '../header/header.component';
 import {SearchFormComponent, SearchType} from '../search-form/search-form.component';
+import {LOCAL_STORAGE, WebStorageService} from 'angular-webstorage-service';
+import {ChildServedService} from '../child-served.service';
+
+
 
 @Component({
   selector: 'app-search',
@@ -27,6 +30,9 @@ export class SearchComponent implements OnInit {
   @ViewChild('addressActionModal') addressActionModal: NgbModal;
   @ViewChild('emailActionModal') emailActionModal: NgbModal;
   @ViewChild('phoneActionModal') phoneActionModal: NgbModal;
+  @ViewChild('childSupportedModal') childSupportedModal: NgbModal;
+  @ViewChild('whyAmIBeingAskedModal') whyAmIBeingAskedModal: NgbModal;
+  @ViewChild('afterChildSupportedModal') afterChildSupportedModal: NgbModal;
 
   @ViewChild('header') header: HeaderComponent;
   @ViewChild('searchForm') searchForm: SearchFormComponent;
@@ -44,7 +50,9 @@ export class SearchComponent implements OnInit {
     private auth: AuthService,
     private modal: NgbModal,
     private analytics: AnalyticsService,
-    private title: Title
+    private childServed: ChildServedService,
+    private title: Title,
+    @Inject(LOCAL_STORAGE) private webStorage: WebStorageService
   ) { }
 
 
@@ -78,6 +86,17 @@ export class SearchComponent implements OnInit {
   }
 
   fetchSearchPostWaitForAuth(searchObject, authenticated) {
+
+    if (authenticated) {
+      const notPreviouslyShown: boolean = this.webStorage.get('inSupportOfChildShown') === null;
+
+      if (notPreviouslyShown) {
+        this.openInSupportOfChildModal();
+        this.webStorage.set('inSupportOfChildShown', true);
+      }
+    }
+
+
 
     const requestObject = {};
 
@@ -589,15 +608,41 @@ export class SearchComponent implements OnInit {
   }
 
 
+  openInSupportOfChildModal() {
+    this.modal.open(this.childSupportedModal, {backdrop: 'static'} ).result.then(
+      result => {
+        if ( result === ModalResult.YES) {
+          this.childServed.childServed();
+        } else {
+        }
+
+        this.modal.open(this.afterChildSupportedModal, {backdrop: 'static'});
+      }
+    );
+  }
+
+
+  whyAmIBeingAskedClicked() {
+    this.analytics.sendEvent('open', 'why-am-i-being-asked-modal');
+    this.modal.open(this.whyAmIBeingAskedModal, {backdrop: 'static'}).result.then(
+      result => {
+      }
+    );
+  }
+
+
 
 
 
 }
 
 
+
 enum ModalResult {
   ACTION,
-  SEARCH
+  SEARCH,
+  YES,
+  NO
 }
 
 enum ViewState {

@@ -42,11 +42,11 @@ export class RootComponent implements OnInit {
               "email": user["name"]
           };
 
-          let s = document.createElement('script');
+          /*let s = document.createElement('script');
           s.src = '//survey.survicate.com/workspaces/8e9be799b0c965ff90b58c89ee13f75f/web_surveys.js';
           s.async = true;
           let e = document.getElementsByTagName('script')[0];
-          e.parentNode.insertBefore(s, e);
+          e.parentNode.insertBefore(s, e);*/
 
         }
 

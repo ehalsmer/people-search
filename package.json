@@ -33,6 +33,7 @@
     "@aws-sdk/client-dynamodb-v2-node": "0.1.0-preview.2",
     "@ng-bootstrap/ng-bootstrap": "^4.1.0",
     "@ng-toolkit/serverless": "^1.1.51",
+    "angular-webstorage-service": "^1.0.2",
     "auth0-js": "^9.10.1",
     "aws-serverless-express": "^3.2.0",
     "aws-ssm-params": "^1.0.2",

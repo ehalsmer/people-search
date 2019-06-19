@@ -41,3 +41,19 @@ a {
 
 
 }
+
+
+
+
+.red-tooltip {
+   > .tooltip-inner {
+    background-color: red;
+  }
+
+
+}
+
+.bs-tooltip-auto[x-placement^=bottom] .arrow::before,
+.bs-tooltip-bottom .arrow::before {
+  border-bottom-color: #f00; /* Red */
+}

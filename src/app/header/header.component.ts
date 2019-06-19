@@ -1,28 +1,53 @@
-import {Component, ElementRef, OnInit, Output, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, Inject, OnInit, Output, ViewChild} from '@angular/core';
 import {AuthService} from '../auth.service';
 import {Router} from '@angular/router';
 import {AnalyticsService} from '../analytics.service';
-import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {NgbModal, NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
+import {ChildServedService} from '../child-served.service';
+import {LOCAL_STORAGE, SESSION_STORAGE, WebStorageService} from 'angular-webstorage-service';
 
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss']
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent implements OnInit, AfterViewInit {
 
-    @ViewChild('socialWorkerCheckModal') socialWorkerCheckModal: ElementRef;
-    @ViewChild('watchVideoModal') watchVideoModal: ElementRef;
-    @ViewChild('videoModal') videoModal: ElementRef;
+
+  ChildServedModalResult = ChildServedModalResult;
+
+  @ViewChild('socialWorkerCheckModal') socialWorkerCheckModal: ElementRef;
+  @ViewChild('watchVideoModal') watchVideoModal: ElementRef;
+  @ViewChild('videoModal') videoModal: ElementRef;
+  @ViewChild('childServedModal') childServedModal: NgbModal;
+
+  @ViewChild('servingChildToolTip') servingChildToolTip: NgbTooltip;
 
   constructor(
     private auth: AuthService,
     private router: Router,
     private analytics: AnalyticsService,
-    private modal: NgbModal
+    private modal: NgbModal,
+    private childServed: ChildServedService,
+    @Inject(SESSION_STORAGE) private sessionStorage: WebStorageService
+
   ) { }
 
-  ngOnInit() {
+  ngOnInit(): void {
+  }
+
+  ngAfterViewInit() {
+
+    setTimeout(() => {
+
+      if (this.sessionStorage.get('servingChildToolTip') !== true) {
+        this.servingChildToolTip.open();
+        setTimeout(() => {this.servingChildToolTip.close(); }, 5000);
+        this.sessionStorage.set('servingChildToolTip', true);
+      }
+    }, 1000);
+
+
   }
 
   login() {
@@ -57,7 +82,6 @@ export class HeaderComponent implements OnInit {
 
     this.modal.dismissAll();
     this.modal.open(this.watchVideoModal, {backdrop: 'static'});
-
   }
 
   openVideoClick() {
@@ -89,6 +113,28 @@ export class HeaderComponent implements OnInit {
       this.auth.register();
   }
 
+  childServedClick() {
+      this.showThanksForServingFosterKids();
+      this.servingChildToolTip.close();
+  }
+  showThanksForServingFosterKids() {
+    this.modal.open(this.childServedModal, {backdrop: 'static'}).result.then(
+      result => {
+        if ( result === ChildServedModalResult.EXIT) {
+          this.childServed.childServed();
+
+        } else {
+
+        }
+      }
+    );
+
+  }
 
 
+}
+
+enum ChildServedModalResult {
+  EXIT,
+  CANCEL
 }

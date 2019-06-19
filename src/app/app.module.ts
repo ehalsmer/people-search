@@ -9,7 +9,7 @@ import { RootComponent } from './root/root.component';
 import { ReactiveFormsModule} from "@angular/forms";
 import { HttpClientModule} from "@angular/common/http";
 import { SearchComponent } from './search/search.component';
-import { AuthService } from "./auth.service";
+import { AuthService } from './auth.service';
 import { HeaderComponent } from './header/header.component';
 import { CallbackComponent } from './callback/callback.component';
 import { AuthErrorComponent } from './auth-error/auth-error.component';
@@ -21,6 +21,7 @@ import { TermsComponent } from './terms/terms.component';
 import { PrivacyComponent } from './privacy/privacy.component';
 import { FooterComponent } from './footer/footer.component';
 import { SearchFormComponent } from './search-form/search-form.component';
+import { StorageServiceModule} from 'angular-webstorage-service';
 
 @NgModule({
   declarations: [
@@ -44,7 +45,8 @@ import { SearchFormComponent } from './search-form/search-form.component';
     AppRoutingModule,
     NgbModule,
     ReactiveFormsModule,
-    HttpClientModule
+    HttpClientModule,
+    StorageServiceModule
 
   ],
   providers: [AuthService],

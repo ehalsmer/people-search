@@ -6,9 +6,17 @@
   left: -25px;
 }
 
+.servingNewChildLink {
+  color: red !important;;
+
+  margin-right: 2em;
+}
+
+
 
 .menuRight {
   margin-top: 25px;
+
 
   @include respond-above(sm) {
     text-align: right;
@@ -16,5 +24,9 @@
 
   @include respond-above(md) {
     text-align: left;
+  }
+
+  button {
+    margin-right: 25px;
   }
 }

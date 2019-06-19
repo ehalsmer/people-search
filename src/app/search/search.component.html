@@ -191,7 +191,6 @@
 
     <app-footer></app-footer>
 
-
 </div>
 
 <ng-template #urlActionModal let-c="close" let-d="dismiss">
@@ -245,3 +244,49 @@
     <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="c(ModalResult.SEARCH)">Perform a search</button>
   </div>
 </ng-template>
+
+<ng-template #childSupportedModal let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">For our metrics</h4>
+  </div>
+  <div class="modal-body">
+    <p>Is this search in support of a foster child?</p>
+    <p><a href="javascript:void(0)" (click)="whyAmIBeingAskedClicked()">Why am I being asked this?</a> </p>
+  </div>
+  <div class="modal-footer justify-content-between" >
+    <button type="button" class="btn btn-primary"  ngbAutofocus (click)="c(ModalResult.YES)">Yes, I'm supporting a foster child</button>
+    <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="c(ModalResult.NO)">No, just testing</button>
+  </div>
+</ng-template>
+
+<ng-template #afterChildSupportedModal let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Keep us informed</h4>
+  </div>
+  <div class="modal-body">
+    <p>Please click the <span style="color:red;"> Serving A New Child?</span> link at the top each time you use People Search for a child that has never previously benefited from People Search. </p>
+    <p><a href="javascript:void(0)" (click)="whyAmIBeingAskedClicked()">Why am I being asked this?</a> </p>
+  </div>
+  <div class="modal-footer justify-content-between" >
+    <button type="button" class="btn btn-primary"  ngbAutofocus (click)="c(ModalResult.YES)">Go to search</button>
+  </div>
+</ng-template>
+
+<ng-template #whyAmIBeingAskedModal let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Metrics bring funds</h4>
+  </div>
+  <div class="modal-body">
+    <p>We are able to offer these tools to you for free, because our funding partners appreciate the impact of your hard work and the
+    effectiveness of these tools. One of the most important metrics is "number of children served". When you indicate that you are serving a child,
+    Connect Our Kids includes that in our aggregate reporting.</p>
+    <p>We do not share anything other than the total number of children served by People Search. We do not correlate those counts to you or organization. We do not collect
+    or share any case related information.</p>
+    <p>If you have any concerns, <a href="mailto:hello@connectourkids.org">Contact Us</a></p>
+  </div>
+  <div class="modal-footer justify-content-between" >
+    <button type="button" class="btn btn-primary"  ngbAutofocus (click)="c(ModalResult.YES)">Go back</button>
+  </div>
+</ng-template>
+
+
