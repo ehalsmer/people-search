@@ -24,7 +24,7 @@ Run `npm run e2e` to execute the end-to-end tests via [Protractor](http://www.pr
 
 ## Deploying
 
-run `AWS_PROFILE=cok npm run build:dev:deploy` or `AWS_PROFILE=cok npm run build:prod:deplpy`
+run `AWS_PROFILE=cok npm run build:dev:deploy` or `AWS_PROFILE=cok npm run build:prod:deploy`
 
 
 API Documentation

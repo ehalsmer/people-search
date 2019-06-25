@@ -418,4 +418,4 @@ function getQueryParameters(event) {
       console.debug("found body");
       return event.body;
     }
-  }
+}
