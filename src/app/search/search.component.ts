@@ -7,7 +7,7 @@ import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {AnalyticsService} from '../analytics.service';
 import {Title} from '@angular/platform-browser';
 import {HeaderComponent} from '../header/header.component';
-import {SearchFormComponent, SearchType} from '../search-form/search-form.component';
+import {SearchFormComponent, SearchType, SearchValidationResult} from '../search-form/search-form.component';
 import {LOCAL_STORAGE, WebStorageService} from 'angular-webstorage-service';
 import {ChildServedService} from '../child-served.service';
 
@@ -22,6 +22,8 @@ export class SearchComponent implements OnInit {
 
 
   ModalResult = ModalResult;
+
+  searchValidationResult: SearchValidationResult = null;
 
   ViewState = ViewState;
   viewState = ViewState.NO_SEARCH;
@@ -66,13 +68,14 @@ export class SearchComponent implements OnInit {
 
     this.viewState = ViewState.SEARCH_LOADING;
 
-    const searchValidationResult = this.searchForm.validateSearch();
+    this.searchValidationResult = this.searchForm.validateSearch();
 
-    if (!searchValidationResult.valid) {
+    if (!this.searchValidationResult.valid) {
+      this.viewState = ViewState.QUERY_NOT_VALID;
       return;
     }
 
-    const searchObject = this.searchForm.getSearchObject(searchValidationResult);
+    const searchObject = this.searchForm.getSearchObject(this.searchValidationResult);
 
     // Wait until the authentication time is ready
     this.auth.waitForAuthReady().then(
@@ -650,6 +653,7 @@ enum ViewState {
   SEARCH_LOADING,
   SEARCH_RESULT,
   SEARCH_ERROR,
+  QUERY_NOT_VALID,
   NO_RESULTS
 }
 

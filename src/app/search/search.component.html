@@ -4,6 +4,14 @@
 
   <app-search-form #searchForm (searchUpdated)="searchFormUpdated()"></app-search-form>
 
+
+  <div class="row"
+    *ngIf="viewState == ViewState.QUERY_NOT_VALID">
+    <div class="col-12 ">
+      <div class="alert alert-warning">{{searchValidationResult.errorMessage}}</div>
+    </div>
+  </div>
+
   <div class="row"
     *ngIf="viewState == ViewState.SEARCH_RESULT && searchResult.warnings != null">
     <div class="col-12 ">
@@ -22,7 +30,7 @@
   <div class="row"
     *ngIf="viewState == ViewState.SEARCH_ERROR">
     <div class="col-12">
-      There was an error during the search. Please try again later, or <a href="mailto:support@connectourkids.org">Contact Support</a>.
+      <div class="alert alert-warning">There was an error during the search. Please try again later, or <a href="mailto:support@connectourkids.org">Contact Support</a>.</div>
     </div>
 
   </div>
