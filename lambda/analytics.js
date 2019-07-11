@@ -1,6 +1,7 @@
 'use strict';
 
 const HttpClientUtils = require('./util.js');
+const auth0 = require('auth0');
 
 const Mixpanel = require('mixpanel');
 
@@ -16,26 +17,59 @@ exports.sendUserInfo = (event,context,callback) => {
   let queryParameters = getQueryParameters(event);
   let distinctId = queryParameters["emailAddress"];
 
+  if(queryParameters["idToken"] != null
+      && httpClientUtils.checkAuthentication(queryParameters)) {
 
-  const mixpanel = Mixpanel.init(
-    process.env.MIX_PANEL_KEY,
-    {
-      protocol: 'https'
-    }
-  );
+    console.debug("Found idToken");
 
-  // create or update a user in Mixpanel Engage
-  mixpanel.people.set(distinctId, {
-      $email: distinctId
-  }, function (err) {
+    let idToken = queryParameters["idToken"];
 
-    if(err != null) {
-      console.error(err);
-      httpClientUtils.sendResponse(callback, 500, err.message);
-    } else {
-      httpClientUtils.sendResponse(callback, 200, "");
-    }
-  });
+    httpClientUtils.getManagementToken(
+
+      managementToken => {
+
+
+        console.debug("Management token");
+        console.debug(managementToken);
+
+        let client = new auth0.ManagementClient({
+          domain: process.env.AUTH0_DOMAIN,
+          token: managementToken
+        });
+
+        let userDataToken = idToken.split(".")[1];
+        let userDataJsonString = new Buffer(userDataToken, 'base64').toString('ascii');
+        let userData = JSON.parse(userDataJsonString);
+
+        console.debug("User data");
+        console.debug(userData);
+
+        client.getUser({ id: userData.sub},
+          (err,user) => {
+
+            console.debug("Got auth0 response");
+            console.debug(user);
+
+            console.debug(err);
+            if(err != null)
+              return;
+
+            sendMixPanelUserInfo(distinctId, user.user_metadata.first_name, user.user_metadata.last_name, callback);
+
+          }
+        );
+
+      }
+
+    );
+
+
+  } else {
+    sendMixPanelUserInfo(distinctId, null, null, callback);
+  }
+
+
+
 
 
 
@@ -53,10 +87,10 @@ exports.sendEvent = (event,context,callback) => {
   eventProperties["distinct_id"] = queryParameters["emailAddress"];
 
   if(event["requestContext"] != null
-    && event["requestContext"["identity"] != null])
+    && event["requestContext"]["identity"] != null)
   eventProperties["ip"] = event["requestContext"]["identity"]["sourceIp"];
 
-  console.log("MIX_PANEL_KEY: " + process.env.MIX_PANEL_KEY);
+  //console.log("MIX_PANEL_KEY: " + process.env.MIX_PANEL_KEY);
 
   const mixpanel = Mixpanel.init(
     process.env.MIX_PANEL_KEY,
@@ -108,7 +142,51 @@ function getQueryParameters(event) {
 
       return JSON.parse(queryParametersString.toString());
     } else {
+
       console.debug("found body");
-      return event.body;
+      return event.queryStringParameters;
     }
+}
+
+
+
+function sendMixPanelUserInfo(emailAddress, firstName, lastName, callback) {
+
+  console.debug("sendMixPanelUserInfo");
+  console.debug("name: " + firstName + " " + lastName);
+
+  // Get the user info from auth0
+  const mixpanel = Mixpanel.init(
+    process.env.MIX_PANEL_KEY,
+    {
+      protocol: 'https'
+    }
+  );
+
+  let properties = {
+      $email: emailAddress
+  };
+
+  if(firstName != null
+    && firstName.trim() != "") {
+    properties.$first_name = firstName;
+  }
+
+  if(lastName != null
+    && lastName.trim() != "") {
+    properties.$last_name = lastName;
+  }
+
+  // create or update a user in Mixpanel Engage
+  mixpanel.people.set(emailAddress, properties, function (err,response) {
+
+    if(err != null) {
+      console.error(err);
+      httpClientUtils.sendResponse(callback, 500, err.message);
+    } else {
+      console.debug(response);
+      httpClientUtils.sendResponse(callback, 200, "");
+    }
+  });
+
 }

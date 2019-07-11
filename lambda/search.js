@@ -5,7 +5,6 @@
 
 const request = require('then-request');
 const fs = require('fs');
-const jwt = require( 'jsonwebtoken');
 const HttpClientUtils = require('./util.js');
 const httpClientUtils = new HttpClientUtils();
 const sha256 = require('sha-256-js');
@@ -242,7 +241,7 @@ function processPiplResponseBody(responseBody) {
 
 function makeQueryCacheKey(queryBody, queryParameters) {
   console.debug("cache key query body: " + JSON.stringify(queryBody));
-  return sha256(JSON.stringify(queryBody)) + "-" + ((checkAuthentication(queryParameters)) ? "true" : "false")
+  return sha256(JSON.stringify(queryBody)) + "-" + ((httpClientUtils.checkAuthentication(queryParameters)) ? "true" : "false")
 }
 
 function makeQueryParts(queryParameters) {
@@ -314,7 +313,7 @@ function makeQueryURL(queryParameters,parameters) {
 
     let url = 'http://api.pipl.com/search/?key=';
 
-    if(checkAuthentication(queryParameters))
+    if(httpClientUtils.checkAuthentication(queryParameters))
       url += parameters['/pipl/business-key'];
     else
       url += parameters['/pipl/teaser-key'];
@@ -323,44 +322,6 @@ function makeQueryURL(queryParameters,parameters) {
     console.debug(url);
 
     return url;
-}
-
-
-
-
-
-function checkAuthentication(queryParameters) {
-
-
-  if(queryParameters["authToken"] == null
-        || queryParameters["idToken"] == null) {
-    return false;
-  }
-
-  /** FIXME This is not good - but I can't figure out how to validate JWTs */
-  //return true;
-
-  return   jwt.verify(queryParameters["idToken"],"-----BEGIN CERTIFICATE-----\n" +
-    "MIIDCzCCAfOgAwIBAgIJcSHKniEXE/FnMA0GCSqGSIb3DQEBCwUAMCMxITAfBgNV\n" +
-    "BAMTGGNvbm5lY3RvdXJraWRzLmF1dGgwLmNvbTAeFw0xOTAzMDQxNTQ1MjdaFw0z\n" +
-    "MjExMTAxNTQ1MjdaMCMxITAfBgNVBAMTGGNvbm5lY3RvdXJraWRzLmF1dGgwLmNv\n" +
-    "bTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAJzjda6SM9bniQi4UZXH\n" +
-    "I/NryAZq9VUR+CmhBcfgZOjGfJsW5IdfUKDWZBM+SyT5nnI+YzZmXShz29AO7hrM\n" +
-    "vUZVfFLGCVfWXX4EuIXJjNm13I0FhHpeU4kdG3w86EbfaBFY+KSamDgUlFokrVxL\n" +
-    "qiLcbb2U6I8QYyZpG+3TI7Es3wtIMcmUEnIC1qZusZT+TiR4MIw1h+rDigXn6ot/\n" +
-    "8SmlWYkHN4lEiX3y8vEmKyGiQSR99Qpr3nkN31qu61nLwAiNnEHRLLPejtPy3i7F\n" +
-    "kqpU3S9F9nkUuO/wCUaGp4Bs21VOiCRtE0VghsEbaFDEOHxfxAL6s+1Ip3y0ewc1\n" +
-    "j7MCAwEAAaNCMEAwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUfk3MumVh036J\n" +
-    "M+689meF1hcT7skwDgYDVR0PAQH/BAQDAgKEMA0GCSqGSIb3DQEBCwUAA4IBAQAi\n" +
-    "dadk93ytvFD4sS+ZhbtZkbrFrOEJLlDQTvLMq7gMy3XRPGx03dhGwQLO37vOGppg\n" +
-    "Q6qd0bEOPDbOaw3ZCBFiqLi1HadtDU64bjGiAxJwlxA0HuPYZALP1nx9c7pkNe7W\n" +
-    "zdMldEChuGDisp7ktfC6DC/qlwW6JWtVpEdPjC+y8QqbOYkjS/2qa7vpPAQ3UuNE\n" +
-    "T7erFE7Pe6/j10eqI+PGGgeTkDkIdax/Bjl0osnY16dVnwJ1tWp1yLWnfYWjGWgJ\n" +
-    "WIZnxsMdr5vKMyWR3TQ7+LgwIlwd0IZk8zv/Kx8ackSHKS33DWPexqWAp2Hi/C/6\n" +
-    "AXw/ai4vXFcL4nZ80f+A\n" +
-    "-----END CERTIFICATE-----\n");
-
-
 }
 
 
