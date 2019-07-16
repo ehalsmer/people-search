@@ -17,6 +17,13 @@ exports.sendUserInfo = (event,context,callback) => {
   let queryParameters = getQueryParameters(event);
   let distinctId = queryParameters["emailAddress"];
 
+  let ip = "";
+
+  if(event["requestContext"] != null
+    && event["requestContext"]["identity"] != null)
+    ip = event["requestContext"]["identity"]["sourceIp"];
+
+
   if(queryParameters["idToken"] != null
       && httpClientUtils.checkAuthentication(queryParameters)) {
 
@@ -54,7 +61,7 @@ exports.sendUserInfo = (event,context,callback) => {
             if(err != null)
               return;
 
-            sendMixPanelUserInfo(distinctId, user.user_metadata.first_name, user.user_metadata.last_name, callback);
+            sendMixPanelUserInfo(distinctId,ip, user.user_metadata.first_name, user.user_metadata.last_name, callback);
 
           }
         );
@@ -65,7 +72,7 @@ exports.sendUserInfo = (event,context,callback) => {
 
 
   } else {
-    sendMixPanelUserInfo(distinctId, null, null, callback);
+    sendMixPanelUserInfo(distinctId,ip, null, null, callback);
   }
 
 
@@ -86,11 +93,7 @@ exports.sendEvent = (event,context,callback) => {
   let eventProperties = queryParameters["options"] != null ? queryParameters["options"] : {};
   eventProperties["distinct_id"] = queryParameters["emailAddress"];
 
-  if(event["requestContext"] != null
-    && event["requestContext"]["identity"] != null)
-  eventProperties["ip"] = event["requestContext"]["identity"]["sourceIp"];
-
-  //console.log("MIX_PANEL_KEY: " + process.env.MIX_PANEL_KEY);
+  console.log("MIX_PANEL_KEY: " + process.env.MIX_PANEL_KEY);
 
   const mixpanel = Mixpanel.init(
     process.env.MIX_PANEL_KEY,
@@ -150,7 +153,7 @@ function getQueryParameters(event) {
 
 
 
-function sendMixPanelUserInfo(emailAddress, firstName, lastName, callback) {
+function sendMixPanelUserInfo(emailAddress, ip, firstName, lastName, callback) {
 
   console.debug("sendMixPanelUserInfo");
   console.debug("name: " + firstName + " " + lastName);
@@ -176,6 +179,8 @@ function sendMixPanelUserInfo(emailAddress, firstName, lastName, callback) {
     && lastName.trim() != "") {
     properties.$last_name = lastName;
   }
+
+  properties.$ip = ip;
 
   // create or update a user in Mixpanel Engage
   mixpanel.people.set(emailAddress, properties, function (err,response) {
