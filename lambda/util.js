@@ -121,7 +121,11 @@ module.exports = class HttpClientUtils {
       "T7erFE7Pe6/j10eqI+PGGgeTkDkIdax/Bjl0osnY16dVnwJ1tWp1yLWnfYWjGWgJ\n" +
       "WIZnxsMdr5vKMyWR3TQ7+LgwIlwd0IZk8zv/Kx8ackSHKS33DWPexqWAp2Hi/C/6\n" +
       "AXw/ai4vXFcL4nZ80f+A\n" +
-      "-----END CERTIFICATE-----\n");
+      "-----END CERTIFICATE-----\n",
+      {
+        audience: process.env.AUTH0_AUDIENCE,
+        issuer: process.env.AUTH0_ISSUER
+      });
 
   }
 
