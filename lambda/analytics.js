@@ -31,44 +31,14 @@ exports.sendUserInfo = (event,context,callback) => {
 
     let idToken = queryParameters["idToken"];
 
-    httpClientUtils.getManagementToken(
+    let userDataToken = idToken.split(".")[1];
+    let userDataJsonString = new Buffer(userDataToken, 'base64').toString('ascii');
+    let userData = JSON.parse(userDataJsonString);
 
-      managementToken => {
+    console.debug("User data");
+    console.debug(userData);
 
-
-        console.debug("Management token");
-        console.debug(managementToken);
-
-        let client = new auth0.ManagementClient({
-          domain: process.env.AUTH0_DOMAIN,
-          token: managementToken
-        });
-
-        let userDataToken = idToken.split(".")[1];
-        let userDataJsonString = new Buffer(userDataToken, 'base64').toString('ascii');
-        let userData = JSON.parse(userDataJsonString);
-
-        console.debug("User data");
-        console.debug(userData);
-
-        client.getUser({ id: userData.sub},
-          (err,user) => {
-
-            console.debug("Got auth0 response");
-            console.debug(user);
-
-            console.debug(err);
-            if(err != null)
-              return;
-
-            sendMixPanelUserInfo(distinctId,ip, user.user_metadata.first_name, user.user_metadata.last_name, callback);
-
-          }
-        );
-
-      }
-
-    );
+    sendMixPanelUserInfo(distinctId, ip, userData.given_name, userData.family_name, callback);
 
 
   } else {

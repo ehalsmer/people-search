@@ -1,6 +1,5 @@
 const ssm = require('aws-ssm-params');
 const jwt = require( 'jsonwebtoken');
-const jwtAuthz = require('express-jwt-authz');
 
 
 module.exports = class HttpClientUtils {
