@@ -1,5 +1,6 @@
 const ssm = require('aws-ssm-params');
 const jwt = require( 'jsonwebtoken');
+const jwtAuthz = require('express-jwt-authz');
 
 
 module.exports = class HttpClientUtils {
@@ -96,14 +97,14 @@ module.exports = class HttpClientUtils {
       return true;
   }
 
-  checkAuthentication(queryParameters) {
+  checkAuthentication(queryParameters, scopes) {
 
     if(queryParameters["authToken"] == null
           || queryParameters["idToken"] == null) {
       return false;
     }
 
-    return   jwt.verify(queryParameters["idToken"],"-----BEGIN CERTIFICATE-----\n" +
+    return   jwt.verify(queryParameters["authToken"],"-----BEGIN CERTIFICATE-----\n" +
       "MIIDCzCCAfOgAwIBAgIJcSHKniEXE/FnMA0GCSqGSIb3DQEBCwUAMCMxITAfBgNV\n" +
       "BAMTGGNvbm5lY3RvdXJraWRzLmF1dGgwLmNvbTAeFw0xOTAzMDQxNTQ1MjdaFw0z\n" +
       "MjExMTAxNTQ1MjdaMCMxITAfBgNVBAMTGGNvbm5lY3RvdXJraWRzLmF1dGgwLmNv\n" +
@@ -124,7 +125,7 @@ module.exports = class HttpClientUtils {
       "-----END CERTIFICATE-----\n",
       {
         audience: process.env.AUTH0_AUDIENCE,
-        issuer: process.env.AUTH0_ISSUER
+        issuer: process.env.AUTH0_DOMAIN
       });
 
   }
@@ -134,13 +135,13 @@ module.exports = class HttpClientUtils {
 
     let auth0 = new AuthenticationClient({
       domain: 'connectourkids.auth0.com',
-      clientId: process.env.AUTH0_CLIENT_ID,
-      clientSecret: process.env.AUTH0_CLIENT_SECRET
+      clientId: process.env.AUTH0_MANAGEMENT_CLIENT_ID,
+      clientSecret: process.env.AUTH0_MANAGEMENT_CLIENT_SECRET
     });
 
     auth0.clientCredentialsGrant(
       {
-        audience: process.env.AUTH0_AUDIENCE,
+        audience: process.env.AUTH0_MANAGEMENT_AUDIENCE,
         scope: 'read:users'
       },
       function(err, response) {

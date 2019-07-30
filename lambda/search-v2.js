@@ -16,6 +16,7 @@ const CachePutRequest = require('./cache-put-request');
 const searchPointersCache = new SearchPointersCache();
 const HashMap = require('HashMap');
 
+
 const cache = new Cache();
 
 exports.query = (event, context, callback) => {
@@ -175,7 +176,7 @@ function processPiplResponseBody(responseBody) {
 
 function makeQueryCacheKey(query, queryParameters) {
   console.debug("cache key query body: " + JSON.stringify(query));
-  return sha256(JSON.stringify(query)) + "-" + ((checkAuthentication(queryParameters)) ? "true" : "false")
+  return sha256(JSON.stringify(query)) + "-" + ((httpClientUtils.checkAuthentication(queryParameters)) ? "true" : "false")
 }
 
 function makePiplRequestBodyParameters(bodyParameters) {
@@ -183,7 +184,7 @@ function makePiplRequestBodyParameters(bodyParameters) {
   console.debug("Make Query Parts: ");
   console.debug(bodyParameters);
 
-  if(bodyParameters['search_pointer_hash'] != null) {
+  if(bodyParameters != null && bodyParameters['search_pointer_hash'] != null) {
     return new Promise((resolve) => {
       // get the real search pointer from the hash
       searchPointersCache.get(bodyParameters['search_pointer_hash']).then(
@@ -208,7 +209,7 @@ function makeRequestUrl(queryParameters,appConfiguration) {
 
   let url = 'http://api.pipl.com/search/?key=';
 
-  if(checkAuthentication(queryParameters))
+  if(httpClientUtils.checkAuthentication(queryParameters))
     url += appConfiguration['/pipl/business-key'];
   else
     url += appConfiguration['/pipl/teaser-key'];
@@ -244,37 +245,6 @@ function makeRequestBody(queryParts) {
 
 
   return returnValue;
-
-}
-
-function checkAuthentication(queryParameters) {
-
-
-  if(queryParameters["authToken"] == null
-        || queryParameters["idToken"] == null) {
-    return false;
-  }
-
-  return   jwt.verify(queryParameters["idToken"],"-----BEGIN CERTIFICATE-----\n" +
-    "MIIDCzCCAfOgAwIBAgIJcSHKniEXE/FnMA0GCSqGSIb3DQEBCwUAMCMxITAfBgNV\n" +
-    "BAMTGGNvbm5lY3RvdXJraWRzLmF1dGgwLmNvbTAeFw0xOTAzMDQxNTQ1MjdaFw0z\n" +
-    "MjExMTAxNTQ1MjdaMCMxITAfBgNVBAMTGGNvbm5lY3RvdXJraWRzLmF1dGgwLmNv\n" +
-    "bTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAJzjda6SM9bniQi4UZXH\n" +
-    "I/NryAZq9VUR+CmhBcfgZOjGfJsW5IdfUKDWZBM+SyT5nnI+YzZmXShz29AO7hrM\n" +
-    "vUZVfFLGCVfWXX4EuIXJjNm13I0FhHpeU4kdG3w86EbfaBFY+KSamDgUlFokrVxL\n" +
-    "qiLcbb2U6I8QYyZpG+3TI7Es3wtIMcmUEnIC1qZusZT+TiR4MIw1h+rDigXn6ot/\n" +
-    "8SmlWYkHN4lEiX3y8vEmKyGiQSR99Qpr3nkN31qu61nLwAiNnEHRLLPejtPy3i7F\n" +
-    "kqpU3S9F9nkUuO/wCUaGp4Bs21VOiCRtE0VghsEbaFDEOHxfxAL6s+1Ip3y0ewc1\n" +
-    "j7MCAwEAAaNCMEAwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUfk3MumVh036J\n" +
-    "M+689meF1hcT7skwDgYDVR0PAQH/BAQDAgKEMA0GCSqGSIb3DQEBCwUAA4IBAQAi\n" +
-    "dadk93ytvFD4sS+ZhbtZkbrFrOEJLlDQTvLMq7gMy3XRPGx03dhGwQLO37vOGppg\n" +
-    "Q6qd0bEOPDbOaw3ZCBFiqLi1HadtDU64bjGiAxJwlxA0HuPYZALP1nx9c7pkNe7W\n" +
-    "zdMldEChuGDisp7ktfC6DC/qlwW6JWtVpEdPjC+y8QqbOYkjS/2qa7vpPAQ3UuNE\n" +
-    "T7erFE7Pe6/j10eqI+PGGgeTkDkIdax/Bjl0osnY16dVnwJ1tWp1yLWnfYWjGWgJ\n" +
-    "WIZnxsMdr5vKMyWR3TQ7+LgwIlwd0IZk8zv/Kx8ackSHKS33DWPexqWAp2Hi/C/6\n" +
-    "AXw/ai4vXFcL4nZ80f+A\n" +
-    "-----END CERTIFICATE-----\n");
-
 
 }
 
