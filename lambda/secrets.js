@@ -31,6 +31,11 @@ module.exports = class Secrets {
   // add $ENV to have the value replaced
 
   getMixPanelKey() {
-    return fetchValue('/people-search/mixpanel/$ENV-key');
+
+    return new Promise(function(accept,reject){
+      accept(process.env.MIX_PANEL_KEY);
+    });
+
+    //return fetchValue('/people-search/mixpanel/$ENV-key');
   }
 };

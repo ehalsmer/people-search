@@ -14,7 +14,7 @@ provider:
   runtime: nodejs8.10
   memorySize: 192
   timeout: 10
-  stage: dev
+  stage: production
   region: us-east-1
   environment:
     STAGE: ${self:provider.stage}
@@ -49,6 +49,12 @@ provider:
         Fn::Join:
           - ""
           - - "arn:aws:ssm:us-east-1:*:parameter/pipl/"
+    - Effect: "Allow"
+      Action:
+        - "ssm:GetParametersByPath"
+        - "ssm:GetParameter"
+      Resource:
+        - "arn:aws:ssm:us-east-1:*:parameter/people-search/*"
 
 package:
   exclude:
