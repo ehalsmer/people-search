@@ -20,6 +20,7 @@ export class AuthService {
 
   auth0 = new auth0.WebAuth({
     clientID: environment.AUTH0_CLIENT_ID,
+    audience: environment.AUTH0_AUDIENCE,
     domain: 'login.connectourkids.org',
     responseType: 'token id_token',
     redirectUri: environment.APP_URL + '/callback',

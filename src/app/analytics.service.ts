@@ -28,6 +28,11 @@ export class AnalyticsService {
     const bodyObject = new Object();
     bodyObject['emailAddress'] = emailAddress;
 
+    if ( this.auth.isAuthenticated()) {
+      bodyObject['authToken'] = this.auth.accessToken;
+      bodyObject['idToken'] = this.auth.idToken;
+    }
+
     this.http.post(
       environment.API_URL + '/api/sendUserInfo',
       JSON.stringify(bodyObject),
