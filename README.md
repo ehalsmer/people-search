@@ -24,6 +24,8 @@ Run `npm run e2e` to execute the end-to-end tests via [Protractor](http://www.pr
 
 ## Deploying
 
+ATTENTION: You must change the provider:stage value in serverless.yml before running the commands below. I have no idea why.
+
 AWS_PROFILE=cok npm run build:dev:deploy
 AWS_PROFILE=cok npm run build:prod:deploy
 

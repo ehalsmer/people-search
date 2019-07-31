@@ -17,6 +17,7 @@ provider:
   stage: dev
   region: us-east-1
   environment:
+    STAGE: ${self:provider.stage}
     MIX_PANEL_KEY: ${self:custom.mixpanel.${self:provider.stage}}
     AUTH0_DOMAIN: https://login.connectourkids.org/
     AUTH0_CLIENT_ID: ${self:custom.auth0ClientId.${self:provider.stage}}
@@ -74,7 +75,7 @@ custom:
     production: search.connectourkids.org
     dev: dev.search.connectourkids.org
   customDomain:
-    basePath: "/"
+    basePath: ""
     domainName: ${self:custom.domains.${self:custom.stage}}
     stage: "${self:custom.stage}"
     createRoute53Record: true

@@ -5,6 +5,9 @@ const auth0 = require('auth0');
 
 const Mixpanel = require('mixpanel');
 
+const Secrets = require('./secrets.js');
+const secrets = new Secrets();
+
 const httpClientUtils = new HttpClientUtils();
 
 
@@ -63,46 +66,58 @@ exports.sendEvent = (event,context,callback) => {
   let eventProperties = queryParameters["options"] != null ? queryParameters["options"] : {};
   eventProperties["distinct_id"] = queryParameters["emailAddress"];
 
-  console.log("MIX_PANEL_KEY: " + process.env.MIX_PANEL_KEY);
 
-  const mixpanel = Mixpanel.init(
-    process.env.MIX_PANEL_KEY,
-    {
-      protocol: 'https',
-      verbose: true
-    },
-  );
+  secrets.getMixPanelKey().then(
+    function(mixPanelKey) {
 
-  mixpanel.track(
-    queryParameters["event"],
-    eventProperties,
-    function (err) {
-      if(err != null) {
-        console.error("Error sending event: " + queryParameters["event"]);
-        console.error(err);
-        httpClientUtils.sendResponse(callback, 500, err.message);
-        return;
-      }
+      const mixpanel = Mixpanel.init(
+        mixPanelKey,
+        {
+          protocol: 'https',
+          verbose: true
+        },
+      );
 
-      else if(queryParameters["event"].startsWith("search-person")) {
-        mixpanel.people.increment(queryParameters["emailAddress"], 'search-person',
-          function (err) {
-            if(err != null) {
-              console.error("Error sending increment: search-person");
+      mixpanel.track(
+        queryParameters["event"],
+        eventProperties,
+        function (err) {
+          if(err != null) {
+            console.error("Error sending event: " + queryParameters["event"]);
+            console.error(err);
+            httpClientUtils.sendResponse(callback, 500, err.message);
+            return;
+          }
 
-              console.error(err);
+          else if(queryParameters["event"].startsWith("search-person")) {
+            mixpanel.people.increment(queryParameters["emailAddress"], 'search-person',
+              function (err) {
+                if(err != null) {
+                  console.error("Error sending increment: search-person");
 
-              httpClientUtils.sendResponse(callback, 500, err.message);
-              return;
-            }
+                  console.error(err);
+
+                  httpClientUtils.sendResponse(callback, 500, err.message);
+                  return;
+                }
+                httpClientUtils.sendResponse(callback, 200, "");
+              });
+          } else {
             httpClientUtils.sendResponse(callback, 200, "");
-          });
-      } else {
-        httpClientUtils.sendResponse(callback, 200, "");
 
-      }
+          }
 
-    });
+        });
+
+    },
+    function(error) {
+      console.error("There was a problem fetching the mixpanel key: " + error);
+    }
+  )
+
+
+
+
 
 };
 
@@ -128,40 +143,51 @@ function sendMixPanelUserInfo(emailAddress, ip, firstName, lastName, callback) {
   console.debug("sendMixPanelUserInfo");
   console.debug("name: " + firstName + " " + lastName);
 
-  // Get the user info from auth0
-  const mixpanel = Mixpanel.init(
-    process.env.MIX_PANEL_KEY,
-    {
-      protocol: 'https'
+  secrets.getMixPanelKey().then(
+    function(key){
+
+      // Get the user info from auth0
+    const mixpanel = Mixpanel.init(
+      key,
+      {
+        protocol: 'https'
+      }
+    );
+
+    let properties = {
+        $email: emailAddress
+    };
+
+    if(firstName != null
+      && firstName.trim() != "") {
+      properties.$first_name = firstName;
     }
-  );
 
-  let properties = {
-      $email: emailAddress
-  };
-
-  if(firstName != null
-    && firstName.trim() != "") {
-    properties.$first_name = firstName;
-  }
-
-  if(lastName != null
-    && lastName.trim() != "") {
-    properties.$last_name = lastName;
-  }
-
-  properties.$ip = ip;
-
-  // create or update a user in Mixpanel Engage
-  mixpanel.people.set(emailAddress, properties, function (err,response) {
-
-    if(err != null) {
-      console.error(err);
-      httpClientUtils.sendResponse(callback, 500, err.message);
-    } else {
-      console.debug(response);
-      httpClientUtils.sendResponse(callback, 200, "");
+    if(lastName != null
+      && lastName.trim() != "") {
+      properties.$last_name = lastName;
     }
-  });
+
+    properties.$ip = ip;
+
+    // create or update a user in Mixpanel Engage
+    mixpanel.people.set(emailAddress, properties, function (err,response) {
+
+      if(err != null) {
+        console.error(err);
+        httpClientUtils.sendResponse(callback, 500, err.message);
+      } else {
+        console.debug(response);
+        httpClientUtils.sendResponse(callback, 200, "");
+      }
+    });
+
+
+    }, function (error) {
+      console.error("Error getting mixpanel key for sendMixPanelInfo: " + error);
+    }
+  )
+
+
 
 }
