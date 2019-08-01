@@ -187,7 +187,7 @@ export class AuthService {
 
   private recurseWaitForAuthReady(resolve): void {
     const self = this;
-    if (localStorage.getItem('isLoggedIn') === 'true' && this._accessToken == '') {
+    if (localStorage.getItem('isLoggedIn') === 'true' && this._accessToken === '') {
       setTimeout(function () {
         self.recurseWaitForAuthReady(resolve);
       }, 100);

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import {AuthService} from "../auth.service";
-import {AnalyticsService} from "../analytics.service";
+import {AuthService} from '../auth.service';
+import {AnalyticsService} from '../analytics.service';
 
 @Component({
   selector: 'app-root',
@@ -9,9 +9,9 @@ import {AnalyticsService} from "../analytics.service";
 })
 export class RootComponent implements OnInit {
 
-  public loadingComplete:boolean = false;
+  public loadingComplete = false;
 
-  constructor(public auth: AuthService, public analytics:AnalyticsService) {
+  constructor(public auth: AuthService, public analytics: AnalyticsService) {
     auth.handleAuthentication();
     auth.scheduleRenewal();
 
@@ -21,25 +21,25 @@ export class RootComponent implements OnInit {
     if (localStorage.getItem('isLoggedIn') === 'true') {
       this.auth.renewTokens();
 
-      this.auth.waitForAuthReady().then(() =>{
+      this.auth.waitForAuthReady().then(() => {
         this.loadingComplete = true;
-      })
+      });
     } else {
       this.loadingComplete = true;
     }
 
     this.auth.waitForUserProfile(1000).then(
       (user) => {
-        this.analytics.sendUserInfo(user["name"]);
+        this.analytics.sendUserInfo(user['name']);
 
-        if(user["name"] != "anonymous@unknown.org") {
+        if (user['name'] !== 'anonymous@unknown.org') {
 
           // @ts-ignore
-          let opts = window._sva = window._sva || {};
+          const opts = window._sva = window._sva || {};
 
           opts.traits = {
-              "user_id": user["name"],
-              "email": user["name"]
+              'user_id': user['name'],
+              'email': user['name']
           };
 
           /*let s = document.createElement('script');
