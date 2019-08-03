@@ -24,7 +24,7 @@ export class AuthService {
     domain: 'login.connectourkids.org',
     responseType: 'token id_token',
     redirectUri: environment.APP_URL + '/callback',
-    scope: 'openid profile'
+    scope: 'openid profile email'
   });
 
 

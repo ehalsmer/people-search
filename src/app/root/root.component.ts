@@ -30,7 +30,7 @@ export class RootComponent implements OnInit {
 
     this.auth.waitForUserProfile(1000).then(
       (user) => {
-        this.analytics.sendUserInfo(user['name']);
+        this.analytics.sendUserInfo(user['email']);
 
         if (user['name'] !== 'anonymous@unknown.org') {
 
