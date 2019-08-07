@@ -1,5 +1,11 @@
-a,span  {
+a, a:not([href]), span  {
   color: #BBB;
+}
+
+a:hover, a:not([href]):hover {
+  cursor: pointer;
+  text-decoration: underline;
+  color: black;
 }
 
 div.row {
