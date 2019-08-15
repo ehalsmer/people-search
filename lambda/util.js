@@ -121,7 +121,10 @@ module.exports = class HttpClientUtils {
       "AXw/ai4vXFcL4nZ80f+A\n" +
       "-----END CERTIFICATE-----\n",
       {
-        audience: process.env.AUTH0_AUDIENCE,
+        audience: [
+          process.env.AUTH0_AUDIENCE,
+          process.env.AUTH0_FAMILY_CONNECTIONS_AUDIENCE
+        ],
         issuer: process.env.AUTH0_DOMAIN
       });
 
