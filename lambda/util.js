@@ -97,9 +97,7 @@ module.exports = class HttpClientUtils {
   }
 
   checkAuthentication(queryParameters, scopes) {
-
-    if(queryParameters["authToken"] == null
-          || queryParameters["idToken"] == null) {
+    if (queryParameters["authToken"] == null) {
       return false;
     }
 
