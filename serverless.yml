@@ -26,6 +26,7 @@ provider:
     AUTH0_MANAGEMENT_CLIENT_SECRET: ${ssm:/people-search/auth0/management-client-secret~true}
     AUTH0_MANAGEMENT_AUDIENCE: https://connectourkids.auth0.com/api/v2/
     AUTH0_AUDIENCE: ${self:custom.auth0Audience.${self:provider.stage}}
+    AUTH0_FAMILY_CONNECTIONS_AUDIENCE: ${self:custom.auth0FamilyConnectionsAudience.${self:provider.stage}}
   iamRoleStatements:
     - Effect: "Allow"
       Action:
@@ -100,6 +101,9 @@ custom:
   auth0Audience:
     production: https://search.connectourkids.org/api/
     dev: https://dev.search.connectourkids.org/api/
+  auth0FamilyConnectionsAudience:
+    production: https://not-setup-family-connections.com/api/
+    dev: https://*.cokids.lucidfoundry.com/api/
   auth0ManagementClientId:
     production: ${ssm:/people-search/auth0/management-client-secret~true}
     dev: ${ssm:/people-search/auth0/management-client-secret~true}
