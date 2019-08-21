@@ -160,36 +160,5 @@ module.exports = class HttpClientUtils {
 
   }
 
-  /*
-  getManagementToken(callback) {
-    let AuthenticationClient = require('auth0').AuthenticationClient;
-
-    let auth0 = new AuthenticationClient({
-      domain: 'connectourkids.auth0.com',
-      clientId: process.env.AUTH0_MANAGEMENT_CLIENT_ID,
-      clientSecret: process.env.AUTH0_MANAGEMENT_CLIENT_SECRET
-    });
-
-    auth0.clientCredentialsGrant(
-      {
-        audience: process.env.AUTH0_MANAGEMENT_AUDIENCE,
-        scope: 'read:users'
-      },
-      function(err, response) {
-        console.debug(response);
-        if (err) {
-          console.log("Error getting auth0 management api token");
-          console.log(err);
-          callback(false);
-        }
-        callback(response.access_token);
-      }
-    );
-
-
-
-  }*/
-
-
 };
 
