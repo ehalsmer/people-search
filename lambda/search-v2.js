@@ -77,7 +77,7 @@ exports.query = (event, context, callback) => {
                     // Store successful results
                     if(result.statusCode == 200)
                       cache.put(cacheKey, processedResponseBody).then(
-                        result => {
+                        cacheResult => {
                           //console.debug("Dynamo Put Response: " + result);
                           httpClientUtils.sendResponse(callback, result.statusCode, processedResponseBody);
 
