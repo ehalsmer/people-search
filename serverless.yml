@@ -14,7 +14,7 @@ provider:
   runtime: nodejs8.10
   memorySize: 192
   timeout: 10
-  stage: production
+  stage: dev
   region: us-east-1
   environment:
     STAGE: ${self:provider.stage}
@@ -176,4 +176,10 @@ functions:
                 {
                   "tokens" : "$input.params('tokens')"
                 }
-
+  redirect:
+    handler: lambda/redirect.redirect
+    events:
+      - http:
+          path: api/redirect
+          method: GET
+          cors: true

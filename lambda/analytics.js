@@ -1,6 +1,5 @@
 'use strict';
 
-const HttpClientUtils = require('./util.js');
 const auth0 = require('auth0');
 
 const Mixpanel = require('mixpanel');
@@ -8,6 +7,7 @@ const Mixpanel = require('mixpanel');
 const Secrets = require('./secrets.js');
 const secrets = new Secrets();
 
+const HttpClientUtils = require('./util.js');
 const httpClientUtils = new HttpClientUtils();
 
 
@@ -17,7 +17,7 @@ exports.sendUserInfo = (event,context,callback) => {
   console.debug("analytics.sendUserInfo event");
   console.debug(event);
 
-  let queryParameters = getQueryParameters(event);
+  let queryParameters = httpClientUtils.getQueryParameters(event);
   let distinctId = queryParameters["emailAddress"];
 
   let ip = "";
@@ -61,7 +61,7 @@ exports.sendEvent = (event,context,callback) => {
   console.debug("analytics.sendEvent event");
   console.debug(event);
 
-  let queryParameters = getQueryParameters(event);
+  let queryParameters = httpClientUtils.getQueryParameters(event);
 
   let eventProperties = queryParameters["options"] != null ? queryParameters["options"] : {};
   eventProperties["distinct_id"] = queryParameters["emailAddress"];
@@ -120,22 +120,6 @@ exports.sendEvent = (event,context,callback) => {
 
 
 };
-
-function getQueryParameters(event) {
-    if(event.isBase64Encoded) {
-      let queryParametersString = new Buffer(event.body,"base64").toString("ascii") ;
-
-      console.debug("Query Parameters String");
-      console.debug(queryParametersString);
-
-      return JSON.parse(queryParametersString.toString());
-    } else {
-
-      console.debug("found body");
-      return event.queryStringParameters;
-    }
-}
-
 
 
 function sendMixPanelUserInfo(emailAddress, ip, firstName, lastName, callback) {

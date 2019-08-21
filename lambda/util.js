@@ -28,6 +28,36 @@ module.exports = class HttpClientUtils {
 
   }
 
+  encodeQueryParameters(parameters) {
+
+    var value = "";
+
+    for (let key in parameters) {
+
+      if(value != "")
+        value +="&";
+      value += key + "=" + encodeURI(parameters[key]);
+
+    }
+
+    return value;
+  }
+
+  getQueryParameters(event) {
+    if(event.isBase64Encoded) {
+      let queryParametersString = new Buffer(event.body,"base64").toString("ascii") ;
+
+      console.debug("Query Parameters String");
+      console.debug(queryParametersString);
+
+      return JSON.parse(queryParametersString.toString());
+    } else {
+
+      console.debug("found body");
+      return event.queryStringParameters;
+    }
+  }
+
   sendResponse(callback, statusCode, body, headers = {}, bodyBase64Encoded = false) {
 
     const response = {
