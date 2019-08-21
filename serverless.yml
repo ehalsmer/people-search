@@ -21,10 +21,6 @@ provider:
     MIX_PANEL_KEY: ${self:custom.mixpanel.${self:provider.stage}}
     AUTH0_DOMAIN: https://login.connectourkids.org/
     AUTH0_CLIENT_ID: ${self:custom.auth0ClientId.${self:provider.stage}}
-    AUTH0_CLIENT_SECRET: ${self:custom.auth0ClientSecret.${self:provider.stage}}
-    AUTH0_MANAGEMENT_CLIENT_ID: F5mXgcbxPBPb7LRBlu4i7HsUqrQcNjgb
-    AUTH0_MANAGEMENT_CLIENT_SECRET: ${ssm:/people-search/auth0/management-client-secret~true}
-    AUTH0_MANAGEMENT_AUDIENCE: https://connectourkids.auth0.com/api/v2/
     AUTH0_AUDIENCE: ${self:custom.auth0Audience.${self:provider.stage}}
     AUTH0_FAMILY_CONNECTIONS_AUDIENCE: ${self:custom.auth0FamilyConnectionsAudience.${self:provider.stage}}
   iamRoleStatements:
@@ -86,9 +82,6 @@ custom:
     dev: ${ssm:/people-search/mixpanel/dev-key~true}
   associateWaf:
     name: us-only
-  auth0ClientSecret:
-    production:  ${ssm:/people-search/auth0/production-client-secret~true}
-    dev:  ${ssm:/people-search/auth0/dev-client-secret~true}
   auth0ClientId:
     production: i5NGofkl7Z4jEexA7YTbasrLT8pcKLDU
     dev: JUR6JVt9N4sn8bHrSXR818rwrj91hsTb
