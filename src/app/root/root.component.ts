@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import {AuthService} from '../auth.service';
 import {AnalyticsService} from '../analytics.service';
+import { environment } from '../../environments/environment';
+
 
 @Component({
   selector: 'app-root',
@@ -32,7 +34,7 @@ export class RootComponent implements OnInit {
       (user) => {
         this.analytics.sendUserInfo(user['email']);
 
-        if (user['name'] !== 'anonymous@unknown.org') {
+        if (user['email'] !== 'anonymous@unknown.org') {
 
           // @ts-ignore
           const opts = window._sva = window._sva || {};
@@ -49,6 +51,16 @@ export class RootComponent implements OnInit {
           e.parentNode.insertBefore(s, e);*/
 
         }
+
+
+
+        // @ts-ignore
+        window.Intercom('boot', {
+          app_id: 'rz1hwc7q',
+          email: user['email'],
+          user_id: user['sub']
+        });
+
 
 
 
