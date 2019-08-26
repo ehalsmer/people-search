@@ -143,6 +143,9 @@ export class AuthService {
       returnTo: environment.APP_URL + returnPath
     });
 
+    // @ts-ignore
+    window.Intercom('shutdown');
+
     // Remove tokens and expiry time
     this._accessToken = '';
     this._idToken = '';

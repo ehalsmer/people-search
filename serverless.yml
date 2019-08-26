@@ -14,7 +14,7 @@ provider:
   runtime: nodejs8.10
   memorySize: 192
   timeout: 10
-  stage: dev
+  stage: production
   region: us-east-1
   environment:
     STAGE: ${self:provider.stage}
@@ -87,7 +87,7 @@ custom:
     production: ${ssm:/people-search/mixpanel/production-key~true}
     dev: ${ssm:/people-search/mixpanel/dev-key~true}
   associateWaf:
-    name: us-only
+    name: us-vn-only
   auth0ClientId:
     production: i5NGofkl7Z4jEexA7YTbasrLT8pcKLDU
     dev: JUR6JVt9N4sn8bHrSXR818rwrj91hsTb

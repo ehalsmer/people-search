@@ -40,8 +40,8 @@ export class RootComponent implements OnInit {
           const opts = window._sva = window._sva || {};
 
           opts.traits = {
-              'user_id': user['name'],
-              'email': user['name']
+              'user_id': user['sub'],
+              'email': user['email']
           };
 
           /*let s = document.createElement('script');
@@ -58,7 +58,8 @@ export class RootComponent implements OnInit {
         window.Intercom('boot', {
           app_id: 'rz1hwc7q',
           email: user['email'],
-          user_id: user['sub']
+          user_id: user['sub'],
+          name: user['name']
         });
 
 
