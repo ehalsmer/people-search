@@ -207,7 +207,7 @@ function makePiplRequestBodyParameters(bodyParameters) {
 
 function makeRequestUrl(queryParameters,appConfiguration) {
 
-  let url = 'http://api.pipl.com/search/?key=';
+  let url = 'https://api.pipl.com/search/?key=';
 
   if(httpClientUtils.checkAuthentication(queryParameters))
     url += appConfiguration['/pipl/business-key'];

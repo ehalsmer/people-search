@@ -311,7 +311,7 @@ function makeQueryBody(queryParts) {
 
 function makeQueryURL(queryParameters,parameters) {
 
-    let url = 'http://api.pipl.com/search/?key=';
+    let url = 'https://api.pipl.com/search/?key=';
 
     if(httpClientUtils.checkAuthentication(queryParameters))
       url += parameters['/pipl/business-key'];
