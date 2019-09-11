@@ -33,7 +33,6 @@ AWS_PROFILE=cok npm run build:prod:deploy
 ## Monitor logs
 
 AWS_PROFILE=cok serverless logs -f FUNCTION -s dev -t
-
 AWS_PROFILE=cok serverless logs -f FUNCTION -s production -t
 
 
