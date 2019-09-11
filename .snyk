@@ -10,3 +10,13 @@ patch:
         patched: '2019-09-11T23:22:16.045Z'
     - auth0 > jwks-rsa > lru-memoizer > lodash:
         patched: '2019-09-11T23:22:16.045Z'
+    - snyk > @snyk/dep-graph > lodash:
+        patched: '2019-09-11T23:24:28.230Z'
+    - snyk > @snyk/dep-graph > graphlib > lodash:
+        patched: '2019-09-11T23:24:28.230Z'
+    - snyk > snyk-go-plugin > graphlib > lodash:
+        patched: '2019-09-11T23:24:28.230Z'
+    - snyk > snyk-nodejs-lockfile-parser > graphlib > lodash:
+        patched: '2019-09-11T23:24:28.230Z'
+    - snyk > snyk-nuget-plugin > dotnet-deps-parser > lodash:
+        patched: '2019-09-11T23:24:28.230Z'
