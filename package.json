@@ -34,7 +34,6 @@
     "@angular/router": "^7.2.15",
     "@aws-sdk/client-dynamodb-v2-node": "0.1.0-preview.2",
     "@ng-bootstrap/ng-bootstrap": "^4.2.1",
-    "@ng-toolkit/serverless": "^1.1.51",
     "angular-webstorage-service": "^1.0.2",
     "auth0": "^2.18.0",
     "auth0-js": "^9.11.2",
