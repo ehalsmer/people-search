@@ -96,7 +96,7 @@ custom:
     dev: https://dev.search.connectourkids.org/api/
   auth0FamilyConnectionsAudience:
     production: https://family.connectourkids.org/api/v1/
-    dev: https://*.cokids.lucidfoundry.com/api/
+    dev: https://family-staging.connectourkids.org/api/v1/
   auth0ManagementClientId:
     production: ${ssm:/people-search/auth0/management-client-secret~true}
     dev: ${ssm:/people-search/auth0/management-client-secret~true}
