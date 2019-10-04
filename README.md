@@ -41,3 +41,12 @@ AWS_PROFILE=cok serverless logs -f FUNCTION -s production -t
 
 API Documentation
 https://docs.google.com/document/d/1145R9-FcmA1NMXMAwbzFmNZ4DRtdWuazCsZYtJa8Owg/edit#heading=h.fzmuu9lzv3sm
+
+
+## Example Local Invocations
+
+Send a mixPanel event
+
+```
+AWS_PROFILE=cok SLS_DEBUG=* serverless invoke local -X -f sendEvent --data '{ "queryStringParameters": {"event":"test","emailAddress":"travis@connectourkids.org","options":{"possibleMatches":50,"personMatch":false}}}'
+```
