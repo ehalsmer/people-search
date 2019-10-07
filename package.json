@@ -24,17 +24,7 @@
   },
   "private": true,
   "dependencies": {
-    "@angular/animations": "^7.2.15",
-    "@angular/common": "^7.2.15",
-    "@angular/compiler": "^7.2.15",
-    "@angular/core": "^7.2.15",
-    "@angular/forms": "^7.2.15",
-    "@angular/platform-browser": "^7.2.15",
-    "@angular/platform-browser-dynamic": "^7.2.15",
-    "@angular/router": "^7.2.15",
     "@aws-sdk/client-dynamodb-v2-node": "0.1.0-preview.2",
-    "@ng-bootstrap/ng-bootstrap": "^4.2.1",
-    "angular-webstorage-service": "^1.0.2",
     "auth0": "^2.18.0",
     "auth0-js": "^9.11.2",
     "aws-param-store": "^3.0.0",
@@ -61,10 +51,6 @@
     "zone.js": "~0.8.26"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^0.13.9",
-    "@angular/cli": "~7.2.1",
-    "@angular/compiler-cli": "^7.2.15",
-    "@angular/language-service": "^7.2.15",
     "@types/jasmine": "~2.8.8",
     "@types/jasminewd2": "~2.0.3",
     "@types/node": "~8.9.4",
